@@ -6,7 +6,13 @@
 	"output": {
 		"abi": [
 			{
-				"inputs": [],
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "_rights",
+						"type": "address"
+					}
+				],
 				"stateMutability": "nonpayable",
 				"type": "constructor"
 			},
@@ -570,12 +576,20 @@
 				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
 			]
 		},
-		"contracts/MyCashToken.sol": {
-			"keccak256": "0x2f3cf612a036603749990beea7ade6ceebbb4945d7627c9fe740f74d969a5426",
+		"contracts/MembershipRights.sol": {
+			"keccak256": "0x8c0f74995cf5af0ac23ef8215b622ff78fbd09e80026b480a3ce4a1fd3d6d08e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://cc892484bbdcfff0b3e62642fcc6a907ca1525006c0f4580278e1e57cd91819d",
-				"dweb:/ipfs/QmYz4BUdHZstmv2KvRWvEZxQhGxGSL6SYPmmmBu1bgW7QM"
+				"bzz-raw://ad275685168e6ced2afdf15580661c51fe8c26567a6d4a80c13652c82f481845",
+				"dweb:/ipfs/QmfR4eVyZM7HAYwNm74oDei6aFw1a8i5AopuoZ3TrtGbHC"
+			]
+		},
+		"contracts/MyCashToken.sol": {
+			"keccak256": "0x405b2f81050e42b2c62c47503e53ddb2fec6e3169dcb1706115e3e168d413adb",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://f4a8a2e05933af71f12f46a4f4369fae480f68b223d2498dc9a14f0ee727d52a",
+				"dweb:/ipfs/QmU75XCi11M1mghWw2zPbbMuxe6HeybwTSFKZ4Sn3k2ZFQ"
 			]
 		}
 	},
