@@ -38,7 +38,7 @@ contract MyBond is ERC20, ERC20Burnable, Pausable, Ownable {
 
     function issue(uint256 amount) public {
         require(totalSupply() + amount <= maxSupplay, "Not enough");
-        require(rights.hasRights(msg.sender,  HOLDER), "Not a holder");
+        require(rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(amount > 0 , "Ammount> 0");
         require(money.balanceOf(msg.sender) >= amount * multiplier);
         require(money.allowance(msg.sender, address(this)) >= amount * multiplier, "Allowance too low");
@@ -54,7 +54,7 @@ contract MyBond is ERC20, ERC20Burnable, Pausable, Ownable {
 
     function redem(uint256 amount) public {
         require(totalSupply() <= amount, "Not enough bonds issued");
-        require(rights.hasRights(msg.sender,  HOLDER), "Not a holder");
+        require(rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(amount > 0 , "Ammount> 0");
         require(money.balanceOf(owner()) >= amount * multiplier);
         //require(money.allowance(msg.sender, address(this)) >= amount * multiplier, "Allowance too low");
@@ -63,7 +63,7 @@ contract MyBond is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function coupon() public {
-        require(rights.hasRights(msg.sender,  HOLDER), "Not a holder");
+        require(rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(money.balanceOf(owner()) >= totalSupply() * couponMultiplier);
 
         for(uint i = 0; i<buyers.length; i++ ) {
@@ -78,7 +78,7 @@ contract MyBond is ERC20, ERC20Burnable, Pausable, Ownable {
         whenNotPaused
         override
     {
-        require(rights.hasRights(to,  HOLDER), "Not a holder");
+        require(rights.hasRights(to,  ASSET_HOLDER), "Not a holder");
         super._beforeTokenTransfer(from, to, amount);
     }
 }

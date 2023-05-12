@@ -10,7 +10,7 @@ import "./MembershipRights.sol";
 contract MyCashToken is ERC20, ERC20Burnable, Pausable, Ownable {
     MembershipRights rights;
 
-    constructor(address _rights) ERC20("CashToken", "ePLN") {
+    constructor(address _rights) ERC20("Digital Stablecoin Based on PLN", "ePLN") {
         rights = MembershipRights(_rights);
     }
 
@@ -27,10 +27,16 @@ contract MyCashToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function mint(address to, uint256 amount) public {
-        require(rights.hasRights(msg.sender,  MINTER), "Not allwed");
-        require(rights.hasRights(to,  HOLDER), "Not a holder");
-        require(amount > 0 , "Ammount> 0");
+        require(rights.hasRights(msg.sender,  MONEY_MINTER), "User is not approved to mint money");
+        require(rights.hasRights(to,  ASSET_HOLDER), "Receiver address is not an approved asset holder");
+        require(amount > 0 , "The amout of money to be minted have to be greater than 0");
         _mint(to, amount);
+    }
+
+    function burn(address from, uint256 amount) public onlyOwner {
+        require(amount > 0 , "The amout of money to be minted have to be greater than 0");
+        require(balanceOf(from) >= amount, "Burn amount is greater than the debit account ballance");
+        _burn(from, amount);
     }
 
     function _beforeTokenTransfer(address from, address to, uint256 amount)
@@ -38,7 +44,8 @@ contract MyCashToken is ERC20, ERC20Burnable, Pausable, Ownable {
         whenNotPaused
         override
     {
-        require(rights.hasRights(to,  HOLDER), "Not a holder");
+        require(rights.hasRights(to, ASSET_HOLDER), "Receiver address is not an approved asset holder");
+        require(balanceOf(from) >= amount, "Transfer amount is greater than the debit account ballance");
         super._beforeTokenTransfer(from, to, amount);
     }
 }
