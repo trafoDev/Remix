@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.18+commit.87f61d96"
+		"version": "0.8.9+commit.e5eed63a"
 	},
 	"language": "Solidity",
 	"output": {
@@ -38,16 +38,34 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "usr",
+						"name": "_usr",
 						"type": "address"
 					},
 					{
 						"internalType": "uint48",
-						"name": "role",
+						"name": "_role",
 						"type": "uint48"
 					}
 				],
-				"name": "updateMember",
+				"name": "setMemberRigts",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address[]",
+						"name": "_usr",
+						"type": "address[]"
+					},
+					{
+						"internalType": "uint48",
+						"name": "_role",
+						"type": "uint48"
+					}
+				],
+				"name": "updateMembersRigts",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -68,7 +86,7 @@
 		"compilationTarget": {
 			"contracts/MembershipRights.sol": "MembershipRights"
 		},
-		"evmVersion": "paris",
+		"evmVersion": "london",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -81,11 +99,11 @@
 	},
 	"sources": {
 		"contracts/MembershipRights.sol": {
-			"keccak256": "0xa5434fed55890d5d1cc9331c53289295fdcbf6041dd7d4d5a1afd2b63f3f93ad",
+			"keccak256": "0x6700192fc9c32a98205234b70a17e89e6d97ec618767f41d771dfa1bd75170d2",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://51e6850800c2b4e156604bd04db233cb51dd6171f05aec8bb7746e59fafb2a95",
-				"dweb:/ipfs/QmeKBx7NWnYoEXNdnBCmSdt9uLQZ7eptP5tPjiuaGiRSbK"
+				"bzz-raw://b66aeb44764c2a6c1bef53e4c4d793a8ad90699064755612b959aba3b1956485",
+				"dweb:/ipfs/QmRdQ2umBZvZGSGJKZZiMh2juqgThAjbRkapKX5xGfFPDf"
 			]
 		}
 	},
