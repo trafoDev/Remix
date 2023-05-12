@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.9+commit.e5eed63a"
+		"version": "0.8.18+commit.87f61d96"
 	},
 	"language": "Solidity",
 	"output": {
@@ -340,6 +340,19 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "redem",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "renounceOwnership",
 				"outputs": [],
@@ -447,6 +460,20 @@
 			}
 		],
 		"devdoc": {
+			"events": {
+				"Approval(address,address,uint256)": {
+					"details": "Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance."
+				},
+				"Paused(address)": {
+					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"Transfer(address,address,uint256)": {
+					"details": "Emitted when `value` tokens are moved from one account (`from`) to another (`to`). Note that `value` may be zero."
+				},
+				"Unpaused(address)": {
+					"details": "Emitted when the pause is lifted by `account`."
+				}
+			},
 			"kind": "dev",
 			"methods": {
 				"allowance(address,address)": {
@@ -513,7 +540,7 @@
 		"compilationTarget": {
 			"contracts/MyBond.sol": "MyBond"
 		},
-		"evmVersion": "london",
+		"evmVersion": "paris",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -590,11 +617,11 @@
 			]
 		},
 		"contracts/MyBond.sol": {
-			"keccak256": "0xbe140d119e7b2d9506e5a384ee2a25daab30559e9a15f9fab77bfaa9acb01216",
+			"keccak256": "0x04c16df91f0c68932b4dd280f66ac84747f6c40818a62c00f5ecd79701a4e51f",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://55c45bd004593b113852b6ed39c41e6d906e3036da2db811e19b3e94ca18ee8f",
-				"dweb:/ipfs/QmZsv6emoxEweXLapJC4VKe73vd6irSXetwxFGQKHZ8Goo"
+				"bzz-raw://10f9b37c075011e20b3da25191f41ea9a57d31c602b8ec18d6cb38c067345ad2",
+				"dweb:/ipfs/QmT6V3YtaZ9p1hJmhqTpEB9Na88YCBCJkfNhMzDdCwvQBE"
 			]
 		}
 	},

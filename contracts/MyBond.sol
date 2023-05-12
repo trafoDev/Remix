@@ -43,6 +43,16 @@ contract MyBond is ERC20, ERC20Burnable, Pausable, Ownable {
 
     }
 
+    function redem(uint256 amount) public {
+        require(totalSupply() <= amount, "Not enough bonds issued");
+        require(rights.hasRights(msg.sender,  HOLDER), "Not a holder");
+        require(amount > 0 , "Ammount> 0");
+        require(money.balanceOf(address(this)) >= amount * multiplier);
+        //require(money.allowance(msg.sender, address(this)) >= amount * multiplier, "Allowance too low");
+        _burn(msg.sender, amount);
+        money.transferFrom(address(this), msg.sender, amount * multiplier);
+
+    }
     function _beforeTokenTransfer(address from, address to, uint256 amount)
         internal
         whenNotPaused
