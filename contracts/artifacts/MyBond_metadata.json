@@ -221,6 +221,13 @@
 			},
 			{
 				"inputs": [],
+				"name": "coupon",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
 				"name": "decimals",
 				"outputs": [
 					{
@@ -617,11 +624,11 @@
 			]
 		},
 		"contracts/MyBond.sol": {
-			"keccak256": "0x04c16df91f0c68932b4dd280f66ac84747f6c40818a62c00f5ecd79701a4e51f",
+			"keccak256": "0xbeb4c328dfc2ea4104ab62f0b34bd018ccfa33529655f523dfe1e94795e11700",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://10f9b37c075011e20b3da25191f41ea9a57d31c602b8ec18d6cb38c067345ad2",
-				"dweb:/ipfs/QmT6V3YtaZ9p1hJmhqTpEB9Na88YCBCJkfNhMzDdCwvQBE"
+				"bzz-raw://906cee0f069f2462bf4b9cafa695850a0f6a3b730c973b1049cdaa2a675de2dd",
+				"dweb:/ipfs/QmavEcFCZNmgqN1W5KDNz8sgnGXCKHhmyjpSpeo531rNVJ"
 			]
 		}
 	},
