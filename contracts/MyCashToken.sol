@@ -45,7 +45,7 @@ contract MyCashToken is ERC20, ERC20Burnable, Pausable, Ownable {
         override
     {
         require(rights.hasRights(to, ASSET_HOLDER), "Receiver address is not an approved asset holder");
-        require(balanceOf(from) >= amount, "Transfer amount is greater than the debit account ballance");
+        require(from==address(0) || balanceOf(from) >= amount, "Transfer amount is greater than the debit account ballance");
         super._beforeTokenTransfer(from, to, amount);
     }
 }

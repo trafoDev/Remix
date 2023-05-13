@@ -603,11 +603,11 @@
 			]
 		},
 		"contracts/MyCashToken.sol": {
-			"keccak256": "0x2f0163375bbbaa45d9bb10116853f0a87ce7753cc6a949882f1a7abbce87e8f2",
+			"keccak256": "0x1acae4c17ac4162f7c843c358deeb999e09e7669b1bb85fab55f88d671e38ecd",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4e573d248216a4ac91fb7e18bf7c47aef62d3f2c273bb149f5230b61f0ee8d65",
-				"dweb:/ipfs/QmYy7w8Vi1UP8AC4nUC7P8EJetJNmTp9raKK3EujZqK9Vw"
+				"bzz-raw://cec758ef529f0710dd077af1c16e80adcccc86ac7a584253bcfaa33719406764",
+				"dweb:/ipfs/QmNmgKUMpbP1v1f65hNk7H2xQzzd2KURRQ7aMznmrh2nhL"
 			]
 		}
 	},
