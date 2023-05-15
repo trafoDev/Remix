@@ -27,7 +27,7 @@ contract MyCashToken is ERC20, ERC20Burnable, Pausable, Ownable {
     }
 
     function mint(address to, uint256 amount) public {
-        require(rights.hasRights(msg.sender,  MONEY_MINTER), "User is not approved to mint money");
+        require(rights.hasRights(msg.sender, MONEY_MINTER), "User is not approved to mint money");
         require(rights.hasRights(to,  ASSET_HOLDER), "Receiver address is not an approved asset holder");
         require(amount > 0 , "The amout of money to be minted have to be greater than 0");
         _mint(to, amount);

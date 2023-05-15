@@ -11,12 +11,12 @@ contract MembershipRights {
     constructor() {
         members[msg.sender] = LIST_ADMIN;
     }
-    function setMemberRigts(address _usr, uint48 _role) public {
-        require(hasRights(msg.sender, LIST_ADMIN), "Not an RightsList admin");
+    function setMemberRights(address _usr, uint48 _role) public {
+        require(hasRights(msg.sender, LIST_ADMIN), "User isn't a list administrator.");
         members[_usr] = _role;
     }    
-    function updateMembersRigts(address[] memory _usr, uint48 _role) public {
-        require(hasRights(msg.sender, LIST_ADMIN), "Not an RightsList admin");
+    function updateMembersRights(address[] memory _usr, uint48 _role) public {
+        require(hasRights(msg.sender, LIST_ADMIN), "User isn't a list administrator.");
         for(uint i=0; i < _usr.length; i++) {
             members[_usr[i]] |= _role;
         }

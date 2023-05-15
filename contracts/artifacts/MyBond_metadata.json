@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.9+commit.e5eed63a"
+		"version": "0.8.20+commit.a1b79de6"
 	},
 	"language": "Solidity",
 	"output": {
@@ -467,6 +467,20 @@
 			}
 		],
 		"devdoc": {
+			"events": {
+				"Approval(address,address,uint256)": {
+					"details": "Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance."
+				},
+				"Paused(address)": {
+					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"Transfer(address,address,uint256)": {
+					"details": "Emitted when `value` tokens are moved from one account (`from`) to another (`to`). Note that `value` may be zero."
+				},
+				"Unpaused(address)": {
+					"details": "Emitted when the pause is lifted by `account`."
+				}
+			},
 			"kind": "dev",
 			"methods": {
 				"allowance(address,address)": {
@@ -533,7 +547,7 @@
 		"compilationTarget": {
 			"contracts/MyBond.sol": "MyBond"
 		},
-		"evmVersion": "london",
+		"evmVersion": "shanghai",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -602,19 +616,19 @@
 			]
 		},
 		"contracts/MembershipRights.sol": {
-			"keccak256": "0x6700192fc9c32a98205234b70a17e89e6d97ec618767f41d771dfa1bd75170d2",
+			"keccak256": "0x24117fe7e5bba884ab8ef060809131ee97c6785d6150f58e7b4d7c0ef79fb7f3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b66aeb44764c2a6c1bef53e4c4d793a8ad90699064755612b959aba3b1956485",
-				"dweb:/ipfs/QmRdQ2umBZvZGSGJKZZiMh2juqgThAjbRkapKX5xGfFPDf"
+				"bzz-raw://d55f79322d1fd042c44c9b8b9936d52bb5fd75241d0f81fc346bab3f1ae2481b",
+				"dweb:/ipfs/QmXQmiy8R9kM5Fji49CVPkEM9uoegEgWrGJp5mkb8Yzono"
 			]
 		},
 		"contracts/MyBond.sol": {
-			"keccak256": "0xfc9e1f9923d24a9f8ef7bf04ea06b985ed77ae7ec9674d2746e29d85c8b4f12c",
+			"keccak256": "0x9813e0b19a6b15c6f0d432fea78732f08926879be9e4bcbfdcc00ff75b0c4fc3",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b8b9f5ac129a5942096313c81bb9484be4dce03253ae15630158f4c7d521c47f",
-				"dweb:/ipfs/Qmf8PgkqgEdr7fY7zszD1YdMQVSo2Y4BPkZZHNgMzfi6Rb"
+				"bzz-raw://d341705003c6f5913ea49bebfc72088499844066d197b01415cb449eb2cc85bc",
+				"dweb:/ipfs/QmUfEkwMiTJxoX7eAWzyrBTatcLt5ka4fxP446aiYPKPD2"
 			]
 		},
 		"hardhat/console.sol": {

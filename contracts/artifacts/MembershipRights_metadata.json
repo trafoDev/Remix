@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.9+commit.e5eed63a"
+		"version": "0.8.20+commit.a1b79de6"
 	},
 	"language": "Solidity",
 	"output": {
@@ -47,7 +47,7 @@
 						"type": "uint48"
 					}
 				],
-				"name": "setMemberRigts",
+				"name": "setMemberRights",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -65,7 +65,7 @@
 						"type": "uint48"
 					}
 				],
-				"name": "updateMembersRigts",
+				"name": "updateMembersRights",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -86,7 +86,7 @@
 		"compilationTarget": {
 			"contracts/MembershipRights.sol": "MembershipRights"
 		},
-		"evmVersion": "london",
+		"evmVersion": "shanghai",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -99,11 +99,11 @@
 	},
 	"sources": {
 		"contracts/MembershipRights.sol": {
-			"keccak256": "0x6700192fc9c32a98205234b70a17e89e6d97ec618767f41d771dfa1bd75170d2",
+			"keccak256": "0x1db644a103bddf7385d27c53f8971742a1d66797f06a662bd1e3d8d93c477ee4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b66aeb44764c2a6c1bef53e4c4d793a8ad90699064755612b959aba3b1956485",
-				"dweb:/ipfs/QmRdQ2umBZvZGSGJKZZiMh2juqgThAjbRkapKX5xGfFPDf"
+				"bzz-raw://773be693bb8cdbe11c67866eb5a26c4965a177ab4ec8139d4d3df0977eb72ddb",
+				"dweb:/ipfs/QmZ8BKN84pigBV1aH4A74k4LRXQ5NAtoxceRQuNer329EF"
 			]
 		}
 	},

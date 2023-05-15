@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.9+commit.e5eed63a"
+		"version": "0.8.20+commit.a1b79de6"
 	},
 	"language": "Solidity",
 	"output": {
@@ -460,6 +460,20 @@
 			}
 		],
 		"devdoc": {
+			"events": {
+				"Approval(address,address,uint256)": {
+					"details": "Emitted when the allowance of a `spender` for an `owner` is set by a call to {approve}. `value` is the new allowance."
+				},
+				"Paused(address)": {
+					"details": "Emitted when the pause is triggered by `account`."
+				},
+				"Transfer(address,address,uint256)": {
+					"details": "Emitted when `value` tokens are moved from one account (`from`) to another (`to`). Note that `value` may be zero."
+				},
+				"Unpaused(address)": {
+					"details": "Emitted when the pause is lifted by `account`."
+				}
+			},
 			"kind": "dev",
 			"methods": {
 				"allowance(address,address)": {
@@ -526,7 +540,7 @@
 		"compilationTarget": {
 			"contracts/MyCashToken.sol": "MyCashToken"
 		},
-		"evmVersion": "london",
+		"evmVersion": "shanghai",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -595,19 +609,19 @@
 			]
 		},
 		"contracts/MembershipRights.sol": {
-			"keccak256": "0x6700192fc9c32a98205234b70a17e89e6d97ec618767f41d771dfa1bd75170d2",
+			"keccak256": "0x1db644a103bddf7385d27c53f8971742a1d66797f06a662bd1e3d8d93c477ee4",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b66aeb44764c2a6c1bef53e4c4d793a8ad90699064755612b959aba3b1956485",
-				"dweb:/ipfs/QmRdQ2umBZvZGSGJKZZiMh2juqgThAjbRkapKX5xGfFPDf"
+				"bzz-raw://773be693bb8cdbe11c67866eb5a26c4965a177ab4ec8139d4d3df0977eb72ddb",
+				"dweb:/ipfs/QmZ8BKN84pigBV1aH4A74k4LRXQ5NAtoxceRQuNer329EF"
 			]
 		},
 		"contracts/MyCashToken.sol": {
-			"keccak256": "0x1acae4c17ac4162f7c843c358deeb999e09e7669b1bb85fab55f88d671e38ecd",
+			"keccak256": "0x41de5b41bf39c900711c505817f716273834e99164dd6fa96d6c8bb0387cd111",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://cec758ef529f0710dd077af1c16e80adcccc86ac7a584253bcfaa33719406764",
-				"dweb:/ipfs/QmNmgKUMpbP1v1f65hNk7H2xQzzd2KURRQ7aMznmrh2nhL"
+				"bzz-raw://d2c4cef4d2087892ad2e6375f3a60f05d6a43a70c947b3df4d0f6302852b58dd",
+				"dweb:/ipfs/Qmb4xdStWjVs88cAMstK4KjTX6n5i8LcYdUNU6ctYEaafc"
 			]
 		}
 	},
