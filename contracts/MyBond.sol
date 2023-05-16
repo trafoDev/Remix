@@ -13,19 +13,28 @@ int constant OFFSET19700101 = 2440588;
 
 
 contract MyBond is Pausable, Ownable {
-    MembershipRights rights;
-    ERC20 money;
-    uint256 totalSupply1;
-    uint256 maxSupplay;
-    uint256 bondPrice;
-    uint256 intrestRate;
-    address[] buyers;
+    MembershipRights private _rights;
+    ERC20 private _money;
+    string private _name;
+    string private _symbol;
+
+    uint256 private _totalSupply1;
+    uint256 private _maxSupplay;
+    uint256 private _bondPrice;
+    uint256 private _intrestRate;
+    address[] private _buyers;
 
     struct BondsByDate{
         uint256 date;
         uint256 balance;
     }
-    mapping(address => BondsByDate[]) buys;
+
+    mapping(address => BondsByDate[]) private _buys;
+
+    modifier nonZero(uint256 amount) {
+        require(amount > 0 , "The number of bonds should be greater than 0.");
+        _;
+    }     
 /*
     constructor(address _rights, address _money, uint256 _maxSupplay, uint256 _price, uint256 _intrestRate) {
         rights  = MembershipRights(_rights);
@@ -35,12 +44,14 @@ contract MyBond is Pausable, Ownable {
         intrestRate = _intrestRate;
     }
 */
-    constructor(address _rights, address _money) {
-        rights      = MembershipRights(_rights);
-        money       = ERC20(_money);
-        maxSupplay  = 1000;
-        bondPrice   = 100;
-        intrestRate = 10; 
+    constructor(address rights, address money) {
+        _rights      = MembershipRights(rights);
+        _money       = ERC20(money);
+        _maxSupplay  = 1000;
+        _bondPrice   = 100;
+        _intrestRate = 10; 
+        _name = "First Polish Bond based on blockchain"; 
+        _symbol = "eBOND"; 
     }
 
     function _daysToDate(uint _days) internal pure returns (uint year, uint month, uint day) {
@@ -67,8 +78,12 @@ contract MyBond is Pausable, Ownable {
         uint month;
         uint day;
         (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
-        date = year*10000+month*100+day;
+        date = year * 10000 + month * 100 + day;
 
+    }
+
+    function setMembershipRights(address rights) public onlyOwner {
+        _rights = MembershipRights(rights);
     }
 
     function decimals() public view virtual returns (uint8) {
@@ -83,65 +98,66 @@ contract MyBond is Pausable, Ownable {
         _unpause();
     }
 
+    function name() public view returns (string memory) {
+        return _name;
+    }    
+    
+    function symbol() public view returns (string memory) {
+        return _symbol;
+    }    
+    
     function totalSupply() public view virtual returns (uint256) {
-       return totalSupply1;
+       return _totalSupply1;
     }
 
-    function getAllByBuyer(address _buyer) public view returns (BondsByDate[] memory) {
-//        console.log(buys[_buyer][0].balance);
-        return buys[_buyer];
+    function getAllByBuyer(address buyer) public view returns (BondsByDate[] memory) {
+        require(buyer != address(0), "Listing bonds from  zero address.");
+        return _buys[buyer];
     }
-/*    
-    function printAllByBuyer() public view  {
-        BondsByDate[] memory result = getAllByBuyer(msg.sender); 
-        for(uint i; i < result.length; i++) {
-            console.log(result[i].balance);
+
+    function balanceOf(address account) public view returns (uint256) {
+        require(account != address(0), "Checking balance of zero account.");
+        uint256 _balance = 0;
+        for(uint i; i < _buys[msg.sender].length; i++) {
+            _balance += _buys[msg.sender][i].balance;
         }
+        return _balance;
     }
-*/    
-    function issue(uint256 _amount) public {
-        require(totalSupply() + _amount <= maxSupplay, "The total number of bonds exceeds the entire supply value.");
-        require(rights.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
-        require(_amount > 0 , "The number of ordered bonds should be greater than 0.");
-        require(money.balanceOf(msg.sender) >= _amount * bondPrice, "The buyer doesn't have enough money in their account.");
-        require(money.allowance(msg.sender, address(this)) >= _amount * bondPrice, "The account allowance for the trade is set too low.");
-        uint256 currDate = timestampToDate(block.timestamp);
-        uint256 elements = buys[msg.sender].length; 
-//        console.log(currDate);
-        if(elements == 0) {
-//            console.log("Adding:");
-//            console.log("Adding: %u");
-            buyers.push(msg.sender);
-            buys[msg.sender].push(BondsByDate(currDate, _amount));
+
+    function issue(uint256 amount) public nonZero(amount){
+        bool _setRights = (address(_rights) != address(0));
+        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
+        require(totalSupply() + amount <= _maxSupplay, "The total number of bonds exceeds the entire supply value.");
+        require(_money.balanceOf(msg.sender) >= amount * _bondPrice, "The buyer doesn't have enough money in their account.");
+        require(_money.allowance(msg.sender, address(this)) >= amount * _bondPrice, "The account allowance for the trade is set too low.");
+        uint256 _currDate = timestampToDate(block.timestamp);
+        uint256 _elements = _buys[msg.sender].length; 
+        if(_elements == 0) {
+            _buyers.push(msg.sender);
+            _buys[msg.sender].push(BondsByDate(_currDate, amount));
         } else {
-            if(buys[msg.sender][elements-1].date == currDate) {
-                buys[msg.sender][elements-1].balance += _amount;  
-//                console.log("Add");
-//                console.log(buys[msg.sender][elements-1].balance);
+            if(_buys[msg.sender][_elements-1].date == _currDate) {
+                _buys[msg.sender][_elements-1].balance += amount;  
             } else {
-//                console.log(currDate);
-                buys[msg.sender].push(BondsByDate(currDate, _amount));
+                _buys[msg.sender].push(BondsByDate(_currDate, amount));
             }
         }
-        totalSupply1 += _amount;
-        money.transferFrom(msg.sender, owner(), _amount * bondPrice);
+        _totalSupply1 += amount;
+        _money.transferFrom(msg.sender, owner(), amount * _bondPrice);
     }
 
-
-    function redem(uint _buyDate, uint256 _amount) public {
-        require(totalSupply() >= _amount, "The amout exceeds the total supplay of the asset");
-        require(rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
-        require(_amount > 0 , "Ammount> 0");
-        require(money.balanceOf(owner()) >= _amount * bondPrice);
-        require(money.allowance(owner(), address(this)) >= _amount * bondPrice, "Allowance too low");
-        for(uint i; i < buys[msg.sender].length; i++) {
-            if(buys[msg.sender][i].date == _buyDate) {
-//                console.log(buys[msg.sender][i].balance);
-                if(buys[msg.sender][i].balance >= _amount) {
-                    buys[msg.sender][i].balance -= _amount;
-                    totalSupply1 -= _amount;
-                    money.transferFrom(owner(), msg.sender, _amount * bondPrice);
-//                    console.log(buys[msg.sender][i].balance);
+    function redem(uint buyDate, uint256 amount) public nonZero(amount){
+        bool _setRights = (address(_rights) != address(0));
+        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
+        require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
+        require(_money.balanceOf(owner()) >= amount * _bondPrice);
+        require(_money.allowance(owner(), address(this)) >= amount * _bondPrice, "Allowance too low");
+        for(uint i; i < _buys[msg.sender].length; i++) {
+            if(_buys[msg.sender][i].date == buyDate) {
+                if(_buys[msg.sender][i].balance >= amount) {
+                    _buys[msg.sender][i].balance -= amount;
+                    _totalSupply1 -= amount;
+                    _money.transferFrom(owner(), msg.sender, amount * _bondPrice);
                     break;
                 }
             }
@@ -149,13 +165,13 @@ contract MyBond is Pausable, Ownable {
     }
 
     function coupon() public onlyOwner {
-        require(rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
-        require(money.balanceOf(owner()) >= totalSupply() * intrestRate);
+        bool _setRights = (address(_rights) != address(0));
+        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
+        require(_money.balanceOf(owner()) >= totalSupply() * _intrestRate);
 
-        for(uint i = 0; i<buyers.length; i++ ) {
-//            console.log("Cupon for: %s", buyers[i]);
-            for(uint ii = 0; ii<buys[msg.sender].length; ii++ ) {
-                money.transferFrom(owner(), buyers[i], buys[msg.sender][ii].balance * intrestRate);
+        for(uint i = 0; i<_buyers.length; i++ ) {
+            for(uint ii = 0; ii<_buys[msg.sender].length; ii++ ) {
+                _money.transferFrom(owner(), _buyers[i], _buys[msg.sender][ii].balance * _intrestRate);
             }
         }
     }

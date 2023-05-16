@@ -1,27 +1,43 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
+import "@openzeppelin/contracts/access/Ownable.sol";
 
+uint48 constant NONE            = 0x0;
 uint48 constant MONEY_MINTER    = 0x1;
 uint48 constant ASSET_HOLDER    = 0x2;
 uint48 constant LIST_ADMIN      = 0x4;
 
-contract MembershipRights {
-    mapping (address => uint48) members;
+contract MembershipRights is Ownable {
+    mapping (address => uint48) private _members;
+
+    modifier manageable() {
+        require(msg.sender == owner() || hasRights(msg.sender, LIST_ADMIN), "User isn't a list administrator.");
+        _;
+    }     
 
     constructor() {
-        members[msg.sender] = LIST_ADMIN;
+        _members[msg.sender] = LIST_ADMIN;
     }
-    function setMemberRights(address _usr, uint48 _role) public {
-        require(hasRights(msg.sender, LIST_ADMIN), "User isn't a list administrator.");
-        members[_usr] = _role;
+    function setMemberRights(address usr, uint48 role) public manageable() {
+        _members[usr] = role;
     }    
-    function updateMembersRights(address[] memory _usr, uint48 _role) public {
-        require(hasRights(msg.sender, LIST_ADMIN), "User isn't a list administrator.");
-        for(uint i=0; i < _usr.length; i++) {
-            members[_usr[i]] |= _role;
+    function setMembersRights(address[] memory usr, uint48 role) public manageable() {
+        for(uint i=0; i < usr.length; i++) {
+            _members[usr[i]] = role;
+        }
+    }    
+    function updateMemberRights(address usr, uint48 role) public manageable() {
+        _members[usr] = role;
+    }    
+    function updateMembersRights(address[] memory usr, uint48 role) public manageable() {
+        for(uint i=0; i < usr.length; i++) {
+            _members[usr[i]] |= role;
         }
     }    
     function hasRights(address usr, uint48 role) public view returns(bool){
-        return members[usr] & role == role;
+        return _members[usr] & role == role;
+    }    
+    function getRights(address usr) public view returns(uint48){
+        return _members[usr];
     }    
 }

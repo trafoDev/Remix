@@ -1,6 +1,6 @@
 {
 	"compiler": {
-		"version": "0.8.20+commit.a1b79de6"
+		"version": "0.8.18+commit.87f61d96"
 	},
 	"language": "Solidity",
 	"output": {
@@ -9,6 +9,44 @@
 				"inputs": [],
 				"stateMutability": "nonpayable",
 				"type": "constructor"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "previousOwner",
+						"type": "address"
+					},
+					{
+						"indexed": true,
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "OwnershipTransferred",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "usr",
+						"type": "address"
+					}
+				],
+				"name": "getRights",
+				"outputs": [
+					{
+						"internalType": "uint48",
+						"name": "",
+						"type": "uint48"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
 			},
 			{
 				"inputs": [
@@ -35,15 +73,35 @@
 				"type": "function"
 			},
 			{
+				"inputs": [],
+				"name": "owner",
+				"outputs": [
+					{
+						"internalType": "address",
+						"name": "",
+						"type": "address"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "renounceOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "_usr",
+						"name": "usr",
 						"type": "address"
 					},
 					{
 						"internalType": "uint48",
-						"name": "_role",
+						"name": "role",
 						"type": "uint48"
 					}
 				],
@@ -56,12 +114,61 @@
 				"inputs": [
 					{
 						"internalType": "address[]",
-						"name": "_usr",
+						"name": "usr",
 						"type": "address[]"
 					},
 					{
 						"internalType": "uint48",
-						"name": "_role",
+						"name": "role",
+						"type": "uint48"
+					}
+				],
+				"name": "setMembersRights",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "newOwner",
+						"type": "address"
+					}
+				],
+				"name": "transferOwnership",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "usr",
+						"type": "address"
+					},
+					{
+						"internalType": "uint48",
+						"name": "role",
+						"type": "uint48"
+					}
+				],
+				"name": "updateMemberRights",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address[]",
+						"name": "usr",
+						"type": "address[]"
+					},
+					{
+						"internalType": "uint48",
+						"name": "role",
 						"type": "uint48"
 					}
 				],
@@ -73,7 +180,17 @@
 		],
 		"devdoc": {
 			"kind": "dev",
-			"methods": {},
+			"methods": {
+				"owner()": {
+					"details": "Returns the address of the current owner."
+				},
+				"renounceOwnership()": {
+					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
+				},
+				"transferOwnership(address)": {
+					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+				}
+			},
 			"version": 1
 		},
 		"userdoc": {
@@ -86,7 +203,7 @@
 		"compilationTarget": {
 			"contracts/MembershipRights.sol": "MembershipRights"
 		},
-		"evmVersion": "shanghai",
+		"evmVersion": "paris",
 		"libraries": {},
 		"metadata": {
 			"bytecodeHash": "ipfs"
@@ -98,12 +215,28 @@
 		"remappings": []
 	},
 	"sources": {
-		"contracts/MembershipRights.sol": {
-			"keccak256": "0x1db644a103bddf7385d27c53f8971742a1d66797f06a662bd1e3d8d93c477ee4",
+		"@openzeppelin/contracts/access/Ownable.sol": {
+			"keccak256": "0xa94b34880e3c1b0b931662cb1c09e5dfa6662f31cba80e07c5ee71cd135c9673",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://773be693bb8cdbe11c67866eb5a26c4965a177ab4ec8139d4d3df0977eb72ddb",
-				"dweb:/ipfs/QmZ8BKN84pigBV1aH4A74k4LRXQ5NAtoxceRQuNer329EF"
+				"bzz-raw://40fb1b5102468f783961d0af743f91b9980cf66b50d1d12009f6bb1869cea4d2",
+				"dweb:/ipfs/QmYqEbJML4jB1GHbzD4cUZDtJg5wVwNm3vDJq1GbyDus8y"
+			]
+		},
+		"@openzeppelin/contracts/utils/Context.sol": {
+			"keccak256": "0xe2e337e6dde9ef6b680e07338c493ebea1b5fd09b43424112868e9cc1706bca7",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6df0ddf21ce9f58271bdfaa85cde98b200ef242a05a3f85c2bc10a8294800a92",
+				"dweb:/ipfs/QmRK2Y5Yc6BK7tGKkgsgn3aJEQGi5aakeSPZvS65PV8Xp3"
+			]
+		},
+		"contracts/MembershipRights.sol": {
+			"keccak256": "0xd3e0dd832c0db29597c17c6d3371a4c6771fd9fd1c326e1cb24b253bfeabda73",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://147ad4c3a308b589e42facfa0376efa31842e64451afba12ebf66ef9cc489eb1",
+				"dweb:/ipfs/QmXjKwfHAv4UoybcNtc8VACywSHBE6tq9wiyz2XPVW475U"
 			]
 		}
 	},
