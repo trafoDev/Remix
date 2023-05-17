@@ -161,7 +161,7 @@ contract MyBond is Pausable, Ownable {
         require(totalSupply() + amount <= _maxSupplay, "The total number of bonds exceeds the entire supply value.");
         require(_money.balanceOf(msg.sender) >= amount * _bondPrice, "The buyer doesn't have enough money in their account.");
         require(_money.allowance(msg.sender, address(this)) >= amount * _bondPrice, "The account allowance for the trade is set too low.");
-        uint256 _currDate = timestampToDate(block.timestamp) -1;
+        uint256 _currDate = timestampToDate(block.timestamp);
         uint256 _elements = _buys[msg.sender].length; 
         if(_elements == 0) {
             _buyers.push(msg.sender);
