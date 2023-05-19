@@ -19,11 +19,13 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
     string private _name;
     string private _symbol;
 
-    uint256 private _totalSupply1;
     uint256 private _maxSupplay;
     uint256 private _bondPrice;
     uint256 private _dailyIntrestRate;
     uint256 private _intrestRate;
+
+    uint256 private _totalSupply1;
+    mapping(address => uint256) private _balances;
     address[] private _buyers;
 
     struct BondsByDate{
@@ -148,11 +150,12 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
 
     function balanceOf(address account) public view virtual override returns (uint256) {
         require(account != address(0), "Checking balance of zero account.");
-        uint256 _balance = 0;
-        for(uint i; i < _buys[msg.sender].length; i++) {
-            _balance += _buys[msg.sender][i].balance;
-        }
-        return _balance;
+        return _balances[account];
+//        uint256 _balance = 0;
+//        for(uint i; i < _buys[msg.sender].length; i++) {
+//           _balance += _buys[msg.sender][i].balance;
+//        }
+//        return _balance;
     }
 
     function transfer(address , uint256 ) public virtual override returns (bool) {
@@ -198,6 +201,7 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
                 _buys[msg.sender].push(BondsByDate(_currDate, amount));
             }
         }
+        _balances[msg.sender] += amount;
         _totalSupply1 += amount;
         _money.transferFrom(msg.sender, owner(), amount * _bondPrice);
     }
@@ -217,6 +221,7 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
                     _buys[msg.sender][i].balance -= amount;
                     _totalSupply1 -= amount;
                     _money.transferFrom(owner(), msg.sender, amount * (_bondPrice + (_dailyIntrestRate * _days)));
+                    _balances[msg.sender] -= amount;
                     break;
                 }
             }
@@ -227,10 +232,15 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
         bool _setRights = (address(_rights) != address(0));
         require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(_money.balanceOf(owner()) >= totalSupply() * _intrestRate);
+        uint256 _sum;
 
         for(uint i = 0; i<_buyers.length; i++ ) {
-            for(uint ii = 0; ii<_buys[msg.sender].length; ii++ ) {
-                _money.transferFrom(owner(), _buyers[i], _buys[msg.sender][ii].balance * _intrestRate);
+            _sum=0;
+            for(uint ii = 0; ii<_buys[_buyers[i]].length; ii++ ) {
+                _sum += _buys[_buyers[i]][ii].balance;
+            }
+            if( _sum > 0) {
+                _money.transferFrom(owner(), _buyers[i], _sum * _intrestRate);
             }
         }
     }
