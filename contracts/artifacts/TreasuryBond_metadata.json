@@ -207,6 +207,30 @@
 				"inputs": [
 					{
 						"internalType": "address",
+						"name": "spender",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "subtractedValue",
+						"type": "uint256"
+					}
+				],
+				"name": "decreaseAllowance",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
 						"name": "buyer",
 						"type": "address"
 					}
@@ -232,6 +256,30 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "spender",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "addedValue",
+						"type": "uint256"
+					}
+				],
+				"name": "increaseAllowance",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -449,10 +497,16 @@
 			"kind": "dev",
 			"methods": {
 				"balanceOf(address)": {
-					"details": "Returns the amount of tokens owned by `account`."
+					"details": "See {IERC20-balanceOf}."
 				},
 				"decimals()": {
-					"details": "Returns the decimals places of the token."
+					"details": "Returns the number of decimals used to get its user representation. For example, if `decimals` equals `2`, a balance of `505` tokens should be displayed to a user as `5.05` (`505 / 10 ** 2`). Tokens usually opt for a value of 18, imitating the relationship between Ether and Wei. This is the value {ERC20} uses, unless this function is overridden; NOTE: This information is only used for _display_ purposes: it in no way affects any of the arithmetic of the contract, including {IERC20-balanceOf} and {IERC20-transfer}."
+				},
+				"decreaseAllowance(address,uint256)": {
+					"details": "Atomically decreases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address. - `spender` must have allowance for the caller of at least `subtractedValue`."
+				},
+				"increaseAllowance(address,uint256)": {
+					"details": "Atomically increases the allowance granted to `spender` by the caller. This is an alternative to {approve} that can be used as a mitigation for problems described in {IERC20-approve}. Emits an {Approval} event indicating the updated allowance. Requirements: - `spender` cannot be the zero address."
 				},
 				"name()": {
 					"details": "Returns the name of the token."
@@ -467,10 +521,10 @@
 					"details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions anymore. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby removing any functionality that is only available to the owner."
 				},
 				"symbol()": {
-					"details": "Returns the symbol of the token."
+					"details": "Returns the symbol of the token, usually a shorter version of the name."
 				},
 				"totalSupply()": {
-					"details": "Returns the amount of tokens in existence."
+					"details": "See {IERC20-totalSupply}."
 				},
 				"transferOwnership(address)": {
 					"details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
@@ -565,11 +619,11 @@
 			]
 		},
 		"contracts/TreasuryBond.sol": {
-			"keccak256": "0x970e2945353f95728188770f756bc7682e35b6aa4e4d9783631c60cee7d29d91",
+			"keccak256": "0x508a9f623cee06c64238139ad476332ef37938298adb743cf3fdcbf3f0a16196",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://26e5ae3beef60e0df3e4a63aa1ba92f4c4cb1f98b17185e5b017ca3e0aaee4eb",
-				"dweb:/ipfs/QmZmFKvkMhYBv5VtQcBWsXrAexijbJMLCPjtdXpt69cRUm"
+				"bzz-raw://f2aa75bf18db30dc01a7c2c74165c2c2d46a5e2d89cdb0e17b2900277ac9934c",
+				"dweb:/ipfs/QmWWp4VSMXxu6NEmj7KaKK7SaWE9Jk37S1eevLx2Bq8sRE"
 			]
 		}
 	},

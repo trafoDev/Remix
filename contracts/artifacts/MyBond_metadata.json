@@ -69,25 +69,6 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "date",
-						"type": "uint256"
-					}
-				],
-				"name": "_daysFromDateConcatenated",
-				"outputs": [
-					{
-						"internalType": "uint256",
-						"name": "_days",
-						"type": "uint256"
-					}
-				],
-				"stateMutability": "view",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
 						"internalType": "address",
 						"name": "account",
 						"type": "address"
@@ -412,19 +393,11 @@
 			]
 		},
 		"contracts/MyBond.sol": {
-			"keccak256": "0xbb42edd7e1daba3217bcc9c1d3486390b994651012950b34b20ba52f4ed8d9c0",
+			"keccak256": "0x1c1dc80216009be678b56f1643145b8c7855faeaba41f9bebd942883b9c8de01",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://abf91c28ed750005e635ecb7f697adfd4afa4d9be6cc7d2e5267e83dccc99bf3",
-				"dweb:/ipfs/QmQrqiPnNbE76QLJjBoUrjnY19d4jQRwbEwnZ1ic3aGdP9"
-			]
-		},
-		"hardhat/console.sol": {
-			"keccak256": "0x60b0215121bf25612a6739fb2f1ec35f31ee82e4a8216c032c8243d904ab3aa9",
-			"license": "MIT",
-			"urls": [
-				"bzz-raw://6e29880d33dd479bb046ba306993d26ccb779a4b1d94a046cb3567f22948bb4d",
-				"dweb:/ipfs/QmfTY1qzPt5C63Wc7y6JqfZr5899NRvXYdCpyLzR5FXQic"
+				"bzz-raw://00300cfbe8429b94582111a9cef433dd145bc5b5ab3c266d0dbb4cc8e11e8952",
+				"dweb:/ipfs/QmdgioCYYGW2kZKp6RumjR1uoYbu3KpG4HGpraNQszVyCs"
 			]
 		}
 	},
