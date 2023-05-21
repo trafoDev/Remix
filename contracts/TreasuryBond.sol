@@ -12,20 +12,16 @@ uint constant SECONDS_PER_DAY = 24 * 60 * 60;
 int constant OFFSET19700101 = 2440588;
 
 
-contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
+contract TreasuryBond is ERC20, Pausable, Ownable {
     MembershipRights private _rights;
     ERC20 private _money;
     uint private _moneyDecimal;
-    string private _name;
-    string private _symbol;
 
     uint256 private _maxSupplay;
     uint256 private _bondPrice;
     uint256 private _dailyIntrestRate;
     uint256 private _intrestRate;
 
-    uint256 private _totalSupply1;
-    mapping(address => uint256) private _balances;
     address[] private _buyers;
 
     struct BondsByDate{
@@ -48,17 +44,15 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
         intrestRate = _intrestRate;
     }
 */
-    constructor(address rights, address money) {
-        _rights       = MembershipRights(rights);
-        _money        = ERC20(money);
-        _maxSupplay   = 1000000;
-        _bondPrice    = 10000;
-        _intrestRate  = 100; 
+    constructor(address rights, address money) ERC20("First Polish Bond based on blockchain", "eBOND"){
+        _rights = MembershipRights(rights);
+        _money = ERC20(money);
+        _maxSupplay = 1000000;
+        _bondPrice = 10000;
+        _intrestRate = 100; 
         _dailyIntrestRate = 1;
 
-        _moneyDecimal = 2;
-        _name = "First Polish Bond based on blockchain"; 
-        _symbol = "eBOND"; 
+        _moneyDecimal = _money.decimals();
     }
 
     function _daysToDate(uint _days) internal pure returns (uint year, uint month, uint day) {
@@ -112,7 +106,6 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
         uint day;
         (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
         date = year * 10000 + month * 100 + day;
-
     }
 
     function setMembershipRights(address rights) public onlyOwner {
@@ -127,39 +120,17 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
         _unpause();
     }
 
-    function name() public view virtual override returns (string memory) {
-        return _name;
-    }
-
-    function symbol() public view virtual override returns (string memory) {
-        return _symbol;
-    }    
-    
     function decimals() public view virtual override returns (uint8) {
             return 0;
     }    
-
-    function totalSupply() public view virtual override returns (uint256) {
-       return _totalSupply1;
-    }
 
     function getAllByBuyer(address buyer) public view returns (BondsByDate[] memory) {
         require(buyer != address(0), "Listing bonds from  zero address.");
         return _buys[buyer];
     }
 
-    function balanceOf(address account) public view virtual override returns (uint256) {
-        require(account != address(0), "Checking balance of zero account.");
-        return _balances[account];
-//        uint256 _balance = 0;
-//        for(uint i; i < _buys[msg.sender].length; i++) {
-//           _balance += _buys[msg.sender][i].balance;
-//        }
-//        return _balance;
-    }
-
     function transfer(address , uint256 ) public virtual override returns (bool) {
-        return false;
+        revert("This option is not available for eBOND");
     }
 
     function allowance(address , address ) public view virtual override returns (uint256) {
@@ -167,7 +138,7 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
     }
 
     function approve(address , uint256 ) public virtual override returns (bool) {
-        return false;
+        revert("This option is not available for eBOND");
     }
 
     function transferFrom(
@@ -175,13 +146,8 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
         address ,
         uint256 
     ) public virtual override returns (bool) {
-        return false;
+        revert("This option is not available for eBOND");
     }
-
-
-
-
-
 
     function issue(uint256 amount) public nonZero(amount){
         bool _setRights = (address(_rights) != address(0));
@@ -201,8 +167,7 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
                 _buys[msg.sender].push(BondsByDate(_currDate, amount));
             }
         }
-        _balances[msg.sender] += amount;
-        _totalSupply1 += amount;
+        _mint(msg.sender, amount);        
         _money.transferFrom(msg.sender, owner(), amount * _bondPrice);
     }
 
@@ -215,13 +180,12 @@ contract TreasuryBond is IERC20, IERC20Metadata, Pausable, Ownable {
         require(_money.balanceOf(owner()) >= amount * _bondPrice);
         require(_money.allowance(owner(), address(this)) >= amount * _bondPrice, "Allowance too low");
         require(_now > buyDate, "The bond may be redeemed at least one day after the date of purchase.");
-        for(uint i; i < _buys[msg.sender].length; i++) {
+        for(uint i=0; i < _buys[msg.sender].length; i++) {
             if(_buys[msg.sender][i].date == buyDate) {
                 if(_buys[msg.sender][i].balance >= amount) {
                     _buys[msg.sender][i].balance -= amount;
-                    _totalSupply1 -= amount;
                     _money.transferFrom(owner(), msg.sender, amount * (_bondPrice + (_dailyIntrestRate * _days)));
-                    _balances[msg.sender] -= amount;
+                    _burn(msg.sender, amount);
                     break;
                 }
             }
