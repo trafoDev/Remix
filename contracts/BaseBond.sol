@@ -16,10 +16,14 @@ contract BaseBond is ERC20, Pausable, Ownable {
 
     string private _name;
     string private _symbol;
-
+    address private _owner;
+    
+    bool private _envInitialized;
+    bool private _bondInitialized;
 
     MembershipRights private _rights;
     ERC20 private _money;
+
     uint private _moneyDecimal;
 
     uint256 private _maxSupplay;
@@ -40,39 +44,47 @@ contract BaseBond is ERC20, Pausable, Ownable {
         require(amount > 0 , "The number of bonds should be greater than 0.");
         _;
     }     
-/*
-    constructor(address _rights, address _money, uint256 _maxSupplay, uint256 _price, uint256 _intrestRate) {
-        rights  = MembershipRights(_rights);
-        money   = ERC20(_money);
-        maxSupplay  = _maxSupplay;
-        bondPrice   = _price;
-        intrestRate = _intrestRate;
-    }
-*/
-    constructor(address /*rights*/, address /*money*/) ERC20("First Polish Bond based on blockchain", "eBOND"){
-       // _rights = MembershipRights(rights);
-       // _money = ERC20(money);
+    modifier initialized() {
+        require(_envInitialized && _bondInitialized == true, "Token wasn't fully initialized.");
+        _;
+    }     
+
+    constructor() ERC20("", ""){
         _maxSupplay = 1000000;
         _bondPrice = 10000;
         _intrestRate = 100; 
         _dailyIntrestRate = 1;
-
-        //_moneyDecimal = _money.decimals();
+        _envInitialized = false;
+        _bondInitialized = false;
     }
-    function init() public returns (bool) {
-       // _rights = MembershipRights(rights);
-       // _money = ERC20(money);
+
+    function initEnv(address rights, address money, address owner_) public {
+        require(rights != address(0), "Rights list is null.");
+        require(money != address(0), "Money token is null.");
+        require(owner_ != address(0), "Owner address is null.");
+        _rights = MembershipRights(rights);
+        _money = ERC20(money);
+        _moneyDecimal = _money.decimals();
+        _owner = owner_;
+        _envInitialized = true;
+    }
+    
+    function initId(string memory bondName, string memory bondSymbol) public {
         _maxSupplay = 1000000;
         _bondPrice = 10000;
         _intrestRate = 100; 
         _dailyIntrestRate = 1;
-        _name = "First Polish Bond based on blockchain";
-        //ERC20(this)._symbol = "eBOND";
-
-        //_moneyDecimal = _money.decimals();
-        return true;
+        _name = bondName;
+        _symbol = bondSymbol;
+        _bondInitialized = true;
     }
 
+    /**
+     * @dev Returns the name of the token.
+     */
+    function owner() public view virtual override returns (address) {
+        return _owner;
+    }
 
     /**
      * @dev Returns the name of the token.
@@ -183,7 +195,7 @@ contract BaseBond is ERC20, Pausable, Ownable {
         revert("This option is not available for eBOND");
     }
 
-    function issue(uint256 amount) public nonZero(amount){
+    function issue(uint256 amount) public nonZero(amount) initialized() {
         bool _setRights = (address(_rights) != address(0));
         require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
         require(totalSupply() + amount <= _maxSupplay, "The total number of bonds exceeds the entire supply value.");
@@ -205,7 +217,7 @@ contract BaseBond is ERC20, Pausable, Ownable {
         _money.transferFrom(msg.sender, owner(), amount * _bondPrice);
     }
 
-    function redem(uint buyDate, uint256 amount) public nonZero(amount){
+    function redem(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
         bool _setRights = (address(_rights) != address(0));
         uint256 _now = timestampToDate(block.timestamp);
         uint _days = _daysFromDateConcatenated(_now) - _daysFromDateConcatenated(buyDate);
@@ -226,7 +238,7 @@ contract BaseBond is ERC20, Pausable, Ownable {
         }
     }
 
-    function coupon() public onlyOwner {
+    function coupon() public onlyOwner initialized() {
         bool _setRights = (address(_rights) != address(0));
         require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(_money.balanceOf(owner()) >= totalSupply() * _intrestRate);

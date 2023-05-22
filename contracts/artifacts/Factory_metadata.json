@@ -9,7 +9,17 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "_masterContract",
+						"name": "masterContract",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "rights",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "money",
 						"type": "address"
 					}
 				],
@@ -38,9 +48,14 @@
 			{
 				"inputs": [
 					{
-						"internalType": "uint256",
-						"name": "",
-						"type": "uint256"
+						"internalType": "string",
+						"name": "name_",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "symbol_",
+						"type": "string"
 					}
 				],
 				"name": "createChild",
@@ -159,19 +174,19 @@
 			]
 		},
 		"contracts/BaseBond.sol": {
-			"keccak256": "0xb83de6a65c47e92460bdaf9adce805dce9dbf6ad984372a25154594cd5578550",
+			"keccak256": "0x0cf093eade08db47aa4414a44d649dd4f6409280f00a88f56fd2bc7149b74b05",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ad99c0adef2ebbbf70713922e7067580b9193aa6cdd50c17dc4ba780ce5e105b",
-				"dweb:/ipfs/QmcvtQ5YrxRLY8VBTPWBf1h2DW33YGjjRdkM2yuUBCF1TU"
+				"bzz-raw://4cd531b9b70fbaf86d1ee566a112677a0061f3ee127fbb4c5ef2d4efd3f77746",
+				"dweb:/ipfs/QmSXXy3wGYQsjo8AyrSWKPhqqwyDVkeFFoJsNwxwPLr7Pu"
 			]
 		},
 		"contracts/BondFactory.sol": {
-			"keccak256": "0x70c08c2f6987225d82fc6308f3b8c5f5e719646c5081cbbbcd791eb2253ba115",
+			"keccak256": "0xcc90fa7a4d75989b089f0b3ae6dd5f05c0ed3cd0cba4b0c4a552543d1821f986",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://7e61000500af07a1a6050a7f440c784b7f808384f272104dc121ff64a4c1f6f2",
-				"dweb:/ipfs/QmUiGAinQZzZa4acbud4FmqYKLRBS7H3ok2NoX9BrRBqZt"
+				"bzz-raw://3fbfec1f36289f30f43643aca94dc5d45b6d9c1ebd65720853ce9fb38c376b54",
+				"dweb:/ipfs/QmNjAq2uwEVkrWSk4dgNALQAc48yeCZzCUC5nASNcHTPeP"
 			]
 		},
 		"contracts/CloneFactory.sol": {

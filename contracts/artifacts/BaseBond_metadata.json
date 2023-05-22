@@ -6,18 +6,7 @@
 	"output": {
 		"abi": [
 			{
-				"inputs": [
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "",
-						"type": "address"
-					}
-				],
+				"inputs": [],
 				"stateMutability": "nonpayable",
 				"type": "constructor"
 			},
@@ -283,15 +272,43 @@
 				"type": "function"
 			},
 			{
-				"inputs": [],
-				"name": "init",
-				"outputs": [
+				"inputs": [
 					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
+						"internalType": "address",
+						"name": "rights",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "money",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "owner_",
+						"type": "address"
 					}
 				],
+				"name": "initEnv",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "string",
+						"name": "bondName",
+						"type": "string"
+					},
+					{
+						"internalType": "string",
+						"name": "bondSymbol",
+						"type": "string"
+					}
+				],
+				"name": "initId",
+				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
 			},
@@ -525,7 +542,7 @@
 					"details": "Returns the name of the token."
 				},
 				"owner()": {
-					"details": "Returns the address of the current owner."
+					"details": "Returns the name of the token."
 				},
 				"paused()": {
 					"details": "Returns true if the contract is paused, and false otherwise."
@@ -624,11 +641,11 @@
 			]
 		},
 		"contracts/BaseBond.sol": {
-			"keccak256": "0xb83de6a65c47e92460bdaf9adce805dce9dbf6ad984372a25154594cd5578550",
+			"keccak256": "0x0f85a83ea42fd0ebaaed5157d6d320f8ece5b3f1bba77ffd7ba96ec340dbf876",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://ad99c0adef2ebbbf70713922e7067580b9193aa6cdd50c17dc4ba780ce5e105b",
-				"dweb:/ipfs/QmcvtQ5YrxRLY8VBTPWBf1h2DW33YGjjRdkM2yuUBCF1TU"
+				"bzz-raw://c689584f91eed9300a885b87dab6e3abc75b524f8604d1a7a0dc2e140ae6c906",
+				"dweb:/ipfs/QmX9ZQQ5EuJ46SEgVkm5Dr7WBDkwt3pV2RqEHTZunByBFf"
 			]
 		},
 		"contracts/MembershipRights.sol": {
