@@ -1,18 +1,65 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
 import "./MembershipRights.sol";
-//import "hardhat/console.sol";
+import "./OfferTable.sol";
+import "./BondInterface.sol";
+
+error ZeroAddress();
+error NotAvailable();
 
 uint constant SECONDS_PER_DAY = 24 * 60 * 60;
 int constant OFFSET19700101 = 2440588;
 
+function _daysToDate(uint _days)  pure returns (uint year, uint month, uint day) {
+    int __days = int(_days);
 
-contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
+    int L = __days + 68569 + OFFSET19700101;
+    int N = 4 * L / 146097;
+    L = L - (146097 * N + 3) / 4;
+    int _year = 4000 * (L + 1) / 1461001;
+    L = L - 1461 * _year / 4 + 31;
+    int _month = 80 * L / 2447;
+    int _day = L - 2447 * _month / 80;
+    L = _month / 11;
+    _month = _month + 2 - 12 * L;
+    _year = 100 * (N - 49) + _year + L;
+
+    year = uint(_year);
+    month = uint(_month);
+    day = uint(_day);
+}
+/*
+function _daysFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 _days) {
+    require(year >= 1970);
+    int256 _year = int256(year);
+    int256 _month = int256(month);
+    int256 _day = int256(day);
+
+    int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
+        + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
+        - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
+
+    _days = uint256(__days);
+}
+*/
+function _daysFromDateConcatenated(uint256 date)  pure returns  (uint256 _days) {
+    require(date >= 19710000);
+    int256 _day = int256(date % 100);
+    int256 _month = int256((date / 100) % 100);
+    int256 _year = int256(date / 10000);
+    int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
+        + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
+        - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
+
+    _days = uint256(__days);
+}
+
+contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, BondInterface {
 
     string private _name;
     string private _symbol;
@@ -55,7 +102,7 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
         _;
     }     
     modifier initialized() {
-        require(_envInitialized && _bondInitialized == true, "Token wasn't fully initialized.");
+        require((_envInitialized && _bondInitialized) == true, "Token wasn't fully initialized.");
         _;
     }     
 
@@ -70,9 +117,7 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
     }
 
     function initEnv(address rights, address money, address owner_) public {
-        require(rights != address(0), "Rights list is null.");
-        require(money != address(0), "Money token is null.");
-        require(owner_ != address(0), "Owner address is null.");
+        if(rights == address(0) || money == address(0) || owner_ == address(0)) revert ZeroAddress();
         _rights = MembershipRights(rights);
         _money = ERC20(money);
         _moneyDecimal = _money.decimals();
@@ -91,15 +136,14 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
     }
     
     function addPatform(address platform) initialized() public {
-        require(platform != address(0), "Adding zero address platform");
-        bool _setRights = (address(_rights) != address(0));
-        require(_setRights && _rights.hasRights(platform,  ASSET_OFFERING), "The platform isn't defined as an approved offering platform.");
+        if(platform == address(0)) revert ZeroAddress();
+        require(_rights.hasRights(platform,  ASSET_OFFERING), "Platform not approved.");
         _platformsAllowed[platform] = true;
     }
     
     function removePatform(address platform) initialized() public {
-        require(platform != address(0), "Removing zero address platform");
-        require(_platformsAllowed[platform] == true, "The platform isn't registered.");
+        if(platform == address(0)) revert ZeroAddress();
+        require(_platformsAllowed[platform] == true, "Platform not registered.");
         _platformsAllowed[platform] = false;
     }
     
@@ -118,51 +162,6 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
     function decimals() public view virtual override returns (uint8) {
         return 0;
     }    
-
-
-    function _daysToDate(uint _days) internal pure returns (uint year, uint month, uint day) {
-        int __days = int(_days);
-
-        int L = __days + 68569 + OFFSET19700101;
-        int N = 4 * L / 146097;
-        L = L - (146097 * N + 3) / 4;
-        int _year = 4000 * (L + 1) / 1461001;
-        L = L - 1461 * _year / 4 + 31;
-        int _month = 80 * L / 2447;
-        int _day = L - 2447 * _month / 80;
-        L = _month / 11;
-        _month = _month + 2 - 12 * L;
-        _year = 100 * (N - 49) + _year + L;
-
-        year = uint(_year);
-        month = uint(_month);
-        day = uint(_day);
-    }
-
-    function _daysFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 _days) {
-        require(year >= 1970);
-        int256 _year = int256(year);
-        int256 _month = int256(month);
-        int256 _day = int256(day);
-
-        int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
-            + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
-            - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
-
-        _days = uint256(__days);
-    }
-
-    function _daysFromDateConcatenated(uint256 date) internal pure returns  (uint256 _days) {
-        require(date >= 19710000);
-        int256 _day = int256(date % 100);
-        int256 _month = int256((date / 100) % 100);
-        int256 _year = int256(date / 10000);
-        int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
-            + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
-            - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
-
-        _days = uint256(__days);
-    }
 
 
     function timestampToDate(uint timestamp) internal pure returns (uint256 date) {
@@ -186,33 +185,26 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
     }
 
     function getAllByBuyer(address buyer) public view returns (BondsByDate[] memory) {
-        require(buyer != address(0), "Listing bonds from  zero address.");
+        if(buyer == address(0)) revert ZeroAddress();
         return _bondBalance[buyer];
     }
 
-    //IERC20
     function totalSupply() public view virtual override returns (uint256) {
         return _totalSupply;
     }    
 
     function _mint(address account, uint256 amount) internal virtual {
-        require(account != address(0), "Mint to the zero address");
-
-//        _beforeTokenTransfer(address(0), account, amount);
-
+        if(account == address(0)) revert ZeroAddress();
         _totalSupply += amount;
         unchecked {
             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
             _balances[account] += amount;
         }
 //        emit Transfer(address(0), account, amount);
-
-//        _afterTokenTransfer(address(0), account, amount);
     }
     
     function _burn(address account, uint256 amount) internal virtual {
-        require(account != address(0), "Burn from the zero address");
-//        _beforeTokenTransfer(account, address(0), amount);
+        if(account == address(0)) revert ZeroAddress();
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "Burn amount exceeds balance");
@@ -229,216 +221,150 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
         return _allowances[bondOwner][platform];
     }
     function _approve(address bondOwner, address platform, uint256 amount) internal virtual {
-        require(bondOwner != address(0), "Approve from the zero address");
-        require(platform != address(0), "Approve to the zero address");
-
+        if(bondOwner == address(0) || platform == address(0)) revert ZeroAddress();
         _allowances[bondOwner][platform] = amount;
        // emit Approval(bondOwner, platform, amount);
     }
-    function _spendAllowance(address bondOwner, address platform, uint256 amount) internal virtual {
-        uint256 currentAllowance = allowance(bondOwner, platform);
-        if (currentAllowance != type(uint256).max) {
-            require(currentAllowance >= amount, "Insufficient allowance for the platform");
-            unchecked {
-                _approve(bondOwner, platform, currentAllowance - amount);
-            }
-        }
+    function _increaseAllowance(address bondOwner, address platform, uint256 addedValue) internal virtual returns (bool) {
+        _approve(bondOwner, platform, allowance(bondOwner, platform) + addedValue);
+        return true;
     }
-    function _transfer(address from, address to, uint256 amount) internal virtual {
-        require(from != address(0), "Transfer from the zero address");
-        require(to != address(0), "Transfer to the zero address");
-
- //       _beforeTokenTransfer(from, to, amount);
-
-        uint256 fromBalance = _balances[from];
-        require(fromBalance >= amount, "Transfer amount exceeds balance");
+    function _decreaseAllowance(address bondOwner, address platform, uint256 subtractedValue) internal virtual returns (bool) {
+        uint256 currentAllowance = allowance(bondOwner, platform);
+        require(currentAllowance >= subtractedValue, "Decreased allowance below 0");
         unchecked {
-            _balances[from] = fromBalance - amount;
-            // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
-            // decrementing then incrementing.
-            _balances[to] += amount;
+            _approve(bondOwner, platform, currentAllowance - subtractedValue);
         }
-
-        emit Transfer(from, to, amount);
-
-  //      _afterTokenTransfer(from, to, amount);
-    }    
+        return true;
+    }
     function balanceOf(address account) public view virtual override returns (uint256) {
         return _balances[account];
     }
-
-    function transfer(address to, uint256 amount) public virtual override returns (bool) {
-        //revert("This option is not available for eBOND");
+    function transfer(address, uint256) public virtual override returns (bool) {
+        revert NotAvailable();
     }
-
-    function transfer(address to, uint256 date, uint256 amount) public virtual returns (bool) {
-        //revert("This option is not available for eBOND");
-
-        //require(from != address(0), "ERC20: transfer from the zero address");
-        require(to != address(0), "ERC20: transfer to the zero address");
-        require(date > 20200101, "Invalid bond date");
-
-
-
-        bool _setRights = (address(_rights) != address(0));
- //       uint256 _now = timestampToDate(block.timestamp);
- //       uint _days = _daysFromDateConcatenated(_now) - _daysFromDateConcatenated(buyDate);
-        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
-        require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
-//        require(_money.balanceOf(owner()) >= amount * _bondPrice);
-//        require(_money.allowance(owner(), address(this)) >= amount * _bondPrice, "Allowance too low");
- //       require(_now > buyDate, "The bond may be redeemed at least one day after the date of purchase.");
-
-/*
-
-  //      _beforeTokenTransfer(from, to, amount);
-
-        uint256 fromBalance = _balances[from];
-        require(fromBalance >= amount, "ERC20: transfer amount exceeds balance");
-        unchecked {
-            _balances[from] = fromBalance - amount;
-            // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
-            // decrementing then incrementing.
-            _balances[to] += amount;
-        }
-
-        emit Transfer(from, to, amount);
-*/
-//        _afterTokenTransfer(from, to, amount);
-        return true;
-    }
-
-//    function allowance(address , address ) public view virtual override returns (uint256) {
-//        return 0;
-//    }
 
     function approve(address , uint256 ) public virtual override returns (bool) {
-        revert("This option is not available for eBOND");
+        revert NotAvailable();
     }
 
     function transferFrom(address , address , uint256 ) public virtual override returns (bool) {
-        return true;
+        revert NotAvailable();
     }
     function transferFrom(address from, address to, uint256 date, uint256 amount) public virtual returns (bool) {
-        address platform = msg.sender;
+        //msg.sender should be the offering platform
+
         //Basic validations
-        require(date > 20200101, "Invalid bond date");
-        require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
-        require(from != address(0), "From address is set to null.");
-        require(to != address(0), "To address is set to null.");
+//        require(date > 20200101, "Invalid bond date");
+        require(totalSupply() >= amount, "Amout exceeds total supplay");
+        if(from == address(0) || to == address(0)) revert ZeroAddress();
         //validating parties rights
-        if (address(_rights) != address(0)) {
-            require(_rights.hasRights(platform, ASSET_OFFERING), "The sender isn't defined as an approved offering platform.");
-            require(_rights.hasRights(to,  ASSET_HOLDER), "Not a holder");
-        }
+        require(_rights.hasRights(msg.sender, ASSET_OFFERING), "The sender isn't defined as an approved offering platform.");
+        require(_rights.hasRights(to,  ASSET_HOLDER), "Not a holder");
         //Vadidating balances and allowances
-        require(allowance(from, platform) >= amount, "Not enough allowance");
-        require(balanceOf(from) >= amount, "The amout exceeds the total supplay of the asset");
-        require(_bondBalance[from][date].balance >= amount, "The amout exceeds the total supplay of the asset");
+        require(allowance(from, msg.sender) >= amount, "Not enough allowance");
+        require(balanceOf(from) >= amount, "The amout exceeds the total supplay");
 
-  //      _beforeTokenTransfer(from, to, amount);
-
-
-        for(uint i=0; i < _bondBalance[from].length; i++) {
-            if(_bondBalance[from][i].date == date) {
-                BondsByDate memory bond = _bondBalance[from][i];
-                require(bond.balance >= amount, "The amout exceeds the total supplay of the asset");
-                _bondBalance[from][i].balance -= amount;
-                break;
-            }
-        }
-        uint256 fromBalance = _balances[from];
-        unchecked {
-            _balances[from] = fromBalance - amount;
-            // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
-            // decrementing then incrementing.
-            _balances[to] += amount;
-        }
-/*
-        for(uint i=0; i < _bondBalance[from].length; i++) {
-            if(_bondBalance[from][i].date == date) {
-                BondsByDate bond = _bondBalance[from][i];
-                require(bond.balance >= amount, "The amout exceeds the total supplay of the asset");
-                _bondBalance[from][i].balance -= amount;
-                break;
-            }
-        }
-*/
+        _removeFrom(from, date, amount, true);
+        _balances[from] -= amount;
+        _decreaseAllowance(from, msg.sender, amount);
+        _assignTo(to, date, amount);
+        _balances[to] += amount;
 
         emit Transfer(from, to, amount);
-
-//        _afterTokenTransfer(from, to, amount);
         return true;
+    }
+
+    function _assignTo(address to, uint256 date, uint256 amount)  internal virtual {
+        if(_bondBalance[to].length == 0) {
+            _buyers.push(to);
+            _bondBalance[to].push(BondsByDate(date, amount, 0));
+            _bondIndex[to][date] = _bondBalance[to].length;
+        } else {
+            if(_bondIndex[to][date] == 0) {
+                _bondBalance[to].push(BondsByDate(date, amount, 0));
+                _bondIndex[to][date] = _bondBalance[to].length;
+            } else {
+                _bondBalance[to][_bondIndex[to][date]-1].balance += amount;  
+            }
+        }
+    }
+    function _removeFrom(address from, uint256 date, uint256 amount, bool blocked)  internal virtual {
+        uint index = _bondIndex[from][date];
+        require(index != 0, "No such bonds" );
+        BondsByDate memory bonds = _bondBalance[from][index-1];
+        require(bonds.balance >= amount, "Not enough bonds" );  
+        if(!blocked) {
+            require(bonds.balance - bonds.blocked >= amount, "Not enough bonds availible" );  
+
+        } else {
+            require(bonds.blocked >= amount, "Not enough blocked bonds" );  
+            _bondBalance[from][index-1].blocked -= amount;
+        }
+        _bondBalance[from][index-1].balance -= amount;
     }
 
     function issue(uint256 amount) public nonZero(amount) initialized() {
-        bool _setRights = (address(_rights) != address(0));
-        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
+        require(_rights.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
         require(totalSupply() + amount <= _maxSupplay, "The total number of bonds exceeds the entire supply value.");
         require(_money.balanceOf(msg.sender) >= amount * _bondPrice, "The buyer doesn't have enough money in their account.");
         require(_money.allowance(msg.sender, address(this)) >= amount * _bondPrice, "The account allowance for the trade is set too low.");
 
         uint256 _currDate = timestampToDate(block.timestamp);
-        uint256 _elements = _bondBalance[msg.sender].length; 
 
-        if(_elements == 0) {
-            _buyers.push(msg.sender);
-            _bondBalance[msg.sender].push(BondsByDate(_currDate, amount, 0));
-            _bondIndex[msg.sender][_currDate] = _bondBalance[msg.sender].length;
-        } else {
-            if(_bondIndex[msg.sender][_currDate] == 0) {
-                _bondBalance[msg.sender].push(BondsByDate(_currDate, amount, 0));
-                _bondIndex[msg.sender][_currDate] = _bondBalance[msg.sender].length;
-            } else {
-                _bondBalance[msg.sender][_bondIndex[msg.sender][_currDate]-1].balance += amount;  
-            }
-        }
+        _assignTo(msg.sender, _currDate, amount);
         _mint(msg.sender, amount);        
         _money.transferFrom(msg.sender, owner(), amount * _bondPrice);
     }
 
-    function redem(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
-        bool _setRights = (address(_rights) != address(0));
-        uint256 _now = timestampToDate(block.timestamp);
-        uint _days = _daysFromDateConcatenated(_now) - _daysFromDateConcatenated(buyDate);
-        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
-        require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
-        require(_money.balanceOf(owner()) >= amount * _bondPrice);
-        require(_money.allowance(owner(), address(this)) >= amount * _bondPrice, "Allowance too low");
-        require(_now > buyDate, "The bond may be redeemed at least one day after the date of purchase.");
-        
-        uint256 _index = _bondIndex[msg.sender][buyDate]-1;
-        require(_index > 0, "No bonds with the date");
-        require(_bondBalance[msg.sender][_index].balance - _bondBalance[msg.sender][_index].blocked >= amount, "Not enough bonds");
+    function makeOffer(address table, uint buyDate, uint256 amount, uint reqPrice) public returns(uint256) {
+        require(_platformsAllowed[table] == true, "Platform isn't registered.");
+        uint index = _bondIndex[msg.sender][buyDate];
+        require(index != 0, "No such bonds" );
+        BondsByDate memory bonds = _bondBalance[msg.sender][index-1];
+        require(bonds.balance - bonds.blocked >= amount, "Not enough spare bonds" );  
 
-        _bondBalance[msg.sender][_index].balance -= amount;
-        _money.transferFrom(owner(), msg.sender, amount * (_bondPrice + (_dailyIntrestRate * _days)));
-        _burn(msg.sender, amount);
+        _bondBalance[msg.sender][index-1].blocked += amount;
+        _increaseAllowance(msg.sender, table, amount);
+        uint offer = OfferTable(table).newOffer(msg.sender, buyDate, amount, reqPrice);
+        return offer;
     }
 
-    function blockForOfferning(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
-    /*    bool _setRights = (address(_rights) != address(0));
+    function canceleOffer1(address table, uint offer) public returns(bool) {
+        require(_platformsAllowed[table] == true, "Platform isn't registered.");
+        BondOfferDef memory offerDef =  OfferTable(table).cancelOffer(offer);
+        uint _index = _bondIndex[msg.sender][offerDef.bondDate];
+        require(_index != 0, "No such bonds" );
+        BondsByDate memory bonds = _bondBalance[msg.sender][_index-1];
+        require(bonds.blocked >= offerDef.amount2Sell, "Something very Wrong" );  
+        require(address(this) == offerDef.bond2Sell, "Something very Wrong - wrong bond" );  
+        require(msg.sender == offerDef.offerent, "Something very Wrong - someoneelses offer" );  
+
+        _bondBalance[msg.sender][_index-1].blocked -= offerDef.amount2Sell;
+        _decreaseAllowance(msg.sender, table, offerDef.amount2Sell);
+        return true;
+    }
+
+    function redem(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
         uint256 _now = timestampToDate(block.timestamp);
         uint _days = _daysFromDateConcatenated(_now) - _daysFromDateConcatenated(buyDate);
-        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
+        require(_rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
         require(_money.balanceOf(owner()) >= amount * _bondPrice);
         require(_money.allowance(owner(), address(this)) >= amount * _bondPrice, "Allowance too low");
-        require(_now > buyDate, "The bond may be redeemed at least one day after the date of purchase.");
+      //FOR TESTS  require(_now > buyDate, "The bond may be redeemed at least one day after the date of purchase.");
         
-        uint256 _index = _bondIndex[msg.sender][buyDate]-1;
-        require(_index > 0, "No bonds with the date");
+        require(_bondIndex[msg.sender][buyDate] != 0, "No bonds with the date");
+        uint256 _index = _bondIndex[msg.sender][buyDate] - 1;
         require(_bondBalance[msg.sender][_index].balance - _bondBalance[msg.sender][_index].blocked >= amount, "Not enough bonds");
 
         _bondBalance[msg.sender][_index].balance -= amount;
         _money.transferFrom(owner(), msg.sender, amount * (_bondPrice + (_dailyIntrestRate * _days)));
         _burn(msg.sender, amount);
-*/        
     }
 
     function coupon() public onlyOwner initialized() {
-/*        bool _setRights = (address(_rights) != address(0));
-        require(_setRights && _rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
+        require(_rights.hasRights(msg.sender, ASSET_HOLDER), "Not a holder");
         require(_money.balanceOf(owner()) >= totalSupply() * _intrestRate);
         uint256 _sum;
 
@@ -451,7 +377,6 @@ contract BaseBond is Context, IERC20, IERC20Metadata, Pausable, Ownable {
                 _money.transferFrom(owner(), _buyers[i], _sum * _intrestRate);
             }
         }
-*/  
     }
-}
 
+}

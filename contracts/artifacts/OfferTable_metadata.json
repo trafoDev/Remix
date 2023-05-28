@@ -1,0 +1,273 @@
+{
+	"compiler": {
+		"version": "0.8.18+commit.87f61d96"
+	},
+	"language": "Solidity",
+	"output": {
+		"abi": [
+			{
+				"inputs": [],
+				"stateMutability": "nonpayable",
+				"type": "constructor"
+			},
+			{
+				"inputs": [],
+				"name": "ZeroAddress",
+				"type": "error"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					}
+				],
+				"name": "OfferCanceled",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					}
+				],
+				"name": "OfferCreated",
+				"type": "event"
+			},
+			{
+				"anonymous": false,
+				"inputs": [
+					{
+						"indexed": false,
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					}
+				],
+				"name": "OfferFinalized",
+				"type": "event"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					}
+				],
+				"name": "cancelOffer",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "address payable",
+								"name": "offerent",
+								"type": "address"
+							},
+							{
+								"internalType": "address payable",
+								"name": "bond2Sell",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount2Sell",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "bondDate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "active",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct BondOfferDef",
+						"name": "offer",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					},
+					{
+						"internalType": "address",
+						"name": "money",
+						"type": "address"
+					}
+				],
+				"name": "finalizeOffer",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "payable",
+				"type": "function"
+			},
+			{
+				"inputs": [],
+				"name": "getOffers",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "address payable",
+								"name": "offerent",
+								"type": "address"
+							},
+							{
+								"internalType": "address payable",
+								"name": "bond2Sell",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount2Sell",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "bondDate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "active",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct BondOfferDef[]",
+						"name": "",
+						"type": "tuple[]"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "seller",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bondDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount2Sell",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "reqPrice",
+						"type": "uint256"
+					}
+				],
+				"name": "newOffer",
+				"outputs": [
+					{
+						"internalType": "uint256",
+						"name": "",
+						"type": "uint256"
+					}
+				],
+				"stateMutability": "payable",
+				"type": "function"
+			}
+		],
+		"devdoc": {
+			"kind": "dev",
+			"methods": {},
+			"version": 1
+		},
+		"userdoc": {
+			"kind": "user",
+			"methods": {},
+			"version": 1
+		}
+	},
+	"settings": {
+		"compilationTarget": {
+			"contracts/OfferTable.sol": "OfferTable"
+		},
+		"evmVersion": "paris",
+		"libraries": {},
+		"metadata": {
+			"bytecodeHash": "ipfs"
+		},
+		"optimizer": {
+			"enabled": false,
+			"runs": 200
+		},
+		"remappings": []
+	},
+	"sources": {
+		"@openzeppelin/contracts/token/ERC20/IERC20.sol": {
+			"keccak256": "0x9750c6b834f7b43000631af5cc30001c5f547b3ceb3635488f140f60e897ea6b",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://5a7d5b1ef5d8d5889ad2ed89d8619c09383b80b72ab226e0fe7bde1636481e34",
+				"dweb:/ipfs/QmebXWgtEfumQGBdVeM6c71McLixYXQP5Bk6kKXuoY4Bmr"
+			]
+		},
+		"contracts/BondInterface.sol": {
+			"keccak256": "0xb7246787e563fe258857b76052643c76fd3bd98f6ff5df61dff4f8ba03772c8d",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://dacd7c27e2ba7d396e267dffac34f6d175636658355f06bebd3deee30af31a5d",
+				"dweb:/ipfs/QmR6eFuQehmGo6QqrcRQJWss2BjzF8ipz7YshX3K5EdkCz"
+			]
+		},
+		"contracts/OfferTable.sol": {
+			"keccak256": "0x1e7c1968dddeabef05b229c67696e34b9448a28af64ee597aefaff73f6b6422c",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://fdfd6618ae7726c9fd54cc479b1f1a88af38ff8160b0441667783aeab5350dac",
+				"dweb:/ipfs/Qmd89dzK5Gw1eLMKAeFPpUah2Cri428WR6iuKaLxD9PwBg"
+			]
+		},
+		"hardhat/console.sol": {
+			"keccak256": "0x60b0215121bf25612a6739fb2f1ec35f31ee82e4a8216c032c8243d904ab3aa9",
+			"license": "MIT",
+			"urls": [
+				"bzz-raw://6e29880d33dd479bb046ba306993d26ccb779a4b1d94a046cb3567f22948bb4d",
+				"dweb:/ipfs/QmfTY1qzPt5C63Wc7y6JqfZr5899NRvXYdCpyLzR5FXQic"
+			]
+		}
+	},
+	"version": 1
+}
