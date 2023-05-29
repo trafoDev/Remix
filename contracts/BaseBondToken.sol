@@ -5,59 +5,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/extensions/ERC20Burnable.sol";
 import "@openzeppelin/contracts/security/Pausable.sol";
 import "@openzeppelin/contracts/access/Ownable.sol";
-import "./MembershipRights.sol";
+import "./EnvironmentConfig.sol";
 import "./OfferTable.sol";
 import "./BondInterface.sol";
 
-error ZeroAddress();
+error BondZeroAddress();
 error NotAvailable();
-
-uint constant SECONDS_PER_DAY = 24 * 60 * 60;
-int constant OFFSET19700101 = 2440588;
-
-function _daysToDate(uint _days)  pure returns (uint year, uint month, uint day) {
-    int __days = int(_days);
-
-    int L = __days + 68569 + OFFSET19700101;
-    int N = 4 * L / 146097;
-    L = L - (146097 * N + 3) / 4;
-    int _year = 4000 * (L + 1) / 1461001;
-    L = L - 1461 * _year / 4 + 31;
-    int _month = 80 * L / 2447;
-    int _day = L - 2447 * _month / 80;
-    L = _month / 11;
-    _month = _month + 2 - 12 * L;
-    _year = 100 * (N - 49) + _year + L;
-
-    year = uint(_year);
-    month = uint(_month);
-    day = uint(_day);
-}
-/*
-function _daysFromDate(uint256 year, uint256 month, uint256 day) internal pure returns (uint256 _days) {
-    require(year >= 1970);
-    int256 _year = int256(year);
-    int256 _month = int256(month);
-    int256 _day = int256(day);
-
-    int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
-        + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
-        - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
-
-    _days = uint256(__days);
-}
-*/
-function _daysFromDateConcatenated(uint256 date)  pure returns  (uint256 _days) {
-    require(date >= 19710000);
-    int256 _day = int256(date % 100);
-    int256 _month = int256((date / 100) % 100);
-    int256 _year = int256(date / 10000);
-    int256 __days = _day - 32075 + (1461 * (_year + 4800 + (_month - 14) / 12)) / 4
-        + (367 * (_month - 2 - ((_month - 14) / 12) * 12)) / 12
-        - (3 * ((_year + 4900 + (_month - 14) / 12) / 100)) / 4 - OFFSET19700101;
-
-    _days = uint256(__days);
-}
 
 contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, BondInterface {
 
@@ -68,7 +21,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     bool private _envInitialized;
     bool private _bondInitialized;
 
-    MembershipRights private _rights;
+    EnvironmentConfig private _envConfig;
     ERC20 private _money;
 
     uint private _moneyDecimal;
@@ -116,9 +69,9 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         _totalSupply = 0;
     }
 
-    function initEnv(address rights, address money, address owner_) public {
-        if(rights == address(0) || money == address(0) || owner_ == address(0)) revert ZeroAddress();
-        _rights = MembershipRights(rights);
+    function initEnv(address envConfig, address money, address owner_) public {
+        if(envConfig == address(0) || money == address(0) || owner_ == address(0)) revert BondZeroAddress();
+        _envConfig = EnvironmentConfig(envConfig);
         _money = ERC20(money);
         _moneyDecimal = _money.decimals();
         _owner = owner_;
@@ -136,13 +89,13 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     }
     
     function addPatform(address platform) initialized() public {
-        if(platform == address(0)) revert ZeroAddress();
-        require(_rights.hasRights(platform,  ASSET_OFFERING), "Platform not approved.");
+        if(platform == address(0)) revert BondZeroAddress();
+        require(_envConfig.hasRights(platform,  ASSET_OFFERING), "Platform not approved.");
         _platformsAllowed[platform] = true;
     }
     
     function removePatform(address platform) initialized() public {
-        if(platform == address(0)) revert ZeroAddress();
+        if(platform == address(0)) revert BondZeroAddress();
         require(_platformsAllowed[platform] == true, "Platform not registered.");
         _platformsAllowed[platform] = false;
     }
@@ -162,7 +115,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     function decimals() public view virtual override returns (uint8) {
         return 0;
     }    
-
+/*
 
     function timestampToDate(uint timestamp) internal pure returns (uint256 date) {
         uint year;
@@ -171,9 +124,9 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
         date = year * 10000 + month * 100 + day;
     }
-
-    function setMembershipRights(address rights) public onlyOwner {
-        _rights = MembershipRights(rights);
+*/
+    function setMembershipenvConfig(address envConfig) public onlyOwner {
+        _envConfig = EnvironmentConfig(envConfig);
     }
 
     function pause() public onlyOwner {
@@ -185,7 +138,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     }
 
     function getAllByBuyer(address buyer) public view returns (BondsByDate[] memory) {
-        if(buyer == address(0)) revert ZeroAddress();
+        if(buyer == address(0)) revert BondZeroAddress();
         return _bondBalance[buyer];
     }
 
@@ -194,7 +147,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     }    
 
     function _mint(address account, uint256 amount) internal virtual {
-        if(account == address(0)) revert ZeroAddress();
+        if(account == address(0)) revert BondZeroAddress();
         _totalSupply += amount;
         unchecked {
             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
@@ -204,7 +157,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     }
     
     function _burn(address account, uint256 amount) internal virtual {
-        if(account == address(0)) revert ZeroAddress();
+        if(account == address(0)) revert BondZeroAddress();
 
         uint256 accountBalance = _balances[account];
         require(accountBalance >= amount, "Burn amount exceeds balance");
@@ -221,7 +174,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         return _allowances[bondOwner][platform];
     }
     function _approve(address bondOwner, address platform, uint256 amount) internal virtual {
-        if(bondOwner == address(0) || platform == address(0)) revert ZeroAddress();
+        if(bondOwner == address(0) || platform == address(0)) revert BondZeroAddress();
         _allowances[bondOwner][platform] = amount;
        // emit Approval(bondOwner, platform, amount);
     }
@@ -257,10 +210,10 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         //Basic validations
 //        require(date > 20200101, "Invalid bond date");
         require(totalSupply() >= amount, "Amout exceeds total supplay");
-        if(from == address(0) || to == address(0)) revert ZeroAddress();
-        //validating parties rights
-        require(_rights.hasRights(msg.sender, ASSET_OFFERING), "The sender isn't defined as an approved offering platform.");
-        require(_rights.hasRights(to,  ASSET_HOLDER), "Not a holder");
+        if(from == address(0) || to == address(0)) revert BondZeroAddress();
+        //validating parties envConfig
+        require(_envConfig.hasRights(msg.sender, ASSET_OFFERING), "The sender isn't defined as an approved offering platform.");
+        require(_envConfig.hasRights(to,  ASSET_HOLDER), "Not a holder");
         //Vadidating balances and allowances
         require(allowance(from, msg.sender) >= amount, "Not enough allowance");
         require(balanceOf(from) >= amount, "The amout exceeds the total supplay");
@@ -305,12 +258,13 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     }
 
     function issue(uint256 amount) public nonZero(amount) initialized() {
-        require(_rights.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
+        require(_envConfig.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
         require(totalSupply() + amount <= _maxSupplay, "The total number of bonds exceeds the entire supply value.");
         require(_money.balanceOf(msg.sender) >= amount * _bondPrice, "The buyer doesn't have enough money in their account.");
         require(_money.allowance(msg.sender, address(this)) >= amount * _bondPrice, "The account allowance for the trade is set too low.");
 
-        uint256 _currDate = timestampToDate(block.timestamp);
+//        uint256 _currDate = timestampToDate(block.timestamp);
+        uint256 _currDate = _envConfig.getCurrentDate();
 
         _assignTo(msg.sender, _currDate, amount);
         _mint(msg.sender, amount);        
@@ -345,14 +299,13 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         return true;
     }
 
-    function redem(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
-        uint256 _now = timestampToDate(block.timestamp);
-        uint _days = _daysFromDateConcatenated(_now) - _daysFromDateConcatenated(buyDate);
-        require(_rights.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
+    function redemption(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
+        uint _days = _envConfig.getDaysFromNow(buyDate);
+        require(_envConfig.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
         require(_money.balanceOf(owner()) >= amount * _bondPrice);
         require(_money.allowance(owner(), address(this)) >= amount * _bondPrice, "Allowance too low");
-      //FOR TESTS  require(_now > buyDate, "The bond may be redeemed at least one day after the date of purchase.");
+        require(_days > 0, "Cannot redeem the same day");
         
         require(_bondIndex[msg.sender][buyDate] != 0, "No bonds with the date");
         uint256 _index = _bondIndex[msg.sender][buyDate] - 1;
@@ -364,7 +317,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     }
 
     function coupon() public onlyOwner initialized() {
-        require(_rights.hasRights(msg.sender, ASSET_HOLDER), "Not a holder");
+        require(_envConfig.hasRights(msg.sender, ASSET_HOLDER), "Not a holder");
         require(_money.balanceOf(owner()) >= totalSupply() * _intrestRate);
         uint256 _sum;
 

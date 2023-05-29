@@ -4,17 +4,16 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 import "./BondInterface.sol";
-//import "./BaseBondToken.sol";
 
-error ZeroAddress();
+error TableZeroAddress();
 
 struct BondOfferDef {
-    address payable offerent;   // User who recieved tokens (if none - address(0))
-    address payable bond2Sell;  // Token offered by the sender
-    uint256 amount2Sell;        // The number of tokens to give away
-    uint256 bondDate;           // The number of tokens to receive
-    uint256 price;           // The number of tokens to receive
-    bool    active;             // The number of tokens to receive
+    address payable offerent;   // User who sell bonds
+    address payable bond2Sell;  // Bond offered 
+    uint256 bondDate;           // Bond's date
+    uint256 amount2Sell;        // The number of tokens to sell
+    uint256 price;              // Price reqested in exchange
+    bool    active;             // Active flag
 }
 
 contract OfferTable {
@@ -51,7 +50,7 @@ contract OfferTable {
     }
 
     function newOffer(address seller, uint256 bondDate, uint256 amount2Sell, uint reqPrice) public  payable returns(uint256) {
-        if(seller == address(0)) revert ZeroAddress();
+        if(seller == address(0)) revert TableZeroAddress();
         require(amount2Sell > 0, "Ammount must be greter than 0");
         require(IERC20(msg.sender).balanceOf(seller) > amount2Sell, "Not enough bonds");
         require(bondDate > 20200101, "Invalid bond date");
@@ -80,7 +79,7 @@ contract OfferTable {
     }
 
     function finalizeOffer(uint256 offerId, address money) public payable existing(offerId) active(offerId) returns(bool){
-        if(money == address(0)) revert ZeroAddress();
+        if(money == address(0)) revert TableZeroAddress();
         BondOfferDef memory offer = _offers[offerId-1];
         require(offer.active == true, "Offer inactive");
         address buyer = msg.sender;

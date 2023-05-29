@@ -1,0 +1,2 @@
+    error ZeroAddress();
+    error NotAvailable();

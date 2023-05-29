@@ -2,7 +2,7 @@
 var mainAcounts;
 var bonds;
 
-var contractMR;
+var envConfig;
 var cashToken, cashToken0, cashToken1, cashToken2;
 var baseBond; 
 var bond0, bond0_0, bond0_1, bond0_2;
@@ -89,20 +89,20 @@ try {
 async function setup() {
   try {
     mainAcounts = await web3.eth.getAccounts();
-    contractMR = await deploy('MembershipRights', 10);
-    cashToken = await deploy('CashToken', 10, contractMR.address);
+    envConfig = await deploy('EnvironmentConfig', 10);
+    cashToken = await deploy('CashToken', 10, envConfig.address);
     baseBond = await deploy('BaseBondToken', 10);
-    factory = await deploy('Factory', 10, baseBond.address, contractMR.address, cashToken.address);
+    factory = await deploy('BondFactory', 10, baseBond.address, envConfig.address, cashToken.address);
     table = await deploy('OfferTable', 10);
 
     //Wszyscy userzy - all rights
-    await contractMR.setMemberRights(mainAcounts[0], 0xff);
-    await contractMR.setMemberRights(mainAcounts[1], 0xff);
-    await contractMR.setMemberRights(mainAcounts[2], 0xff);
-    await contractMR.setMemberRights(mainAcounts[3], 0xff);
-    await contractMR.setMemberRights(mainAcounts[4], 0xff);
+    await envConfig.setMemberRights(mainAcounts[0], 0xff);
+    await envConfig.setMemberRights(mainAcounts[1], 0xff);
+    await envConfig.setMemberRights(mainAcounts[2], 0xff);
+    await envConfig.setMemberRights(mainAcounts[3], 0xff);
+    await envConfig.setMemberRights(mainAcounts[4], 0xff);
 
-    await contractMR.setMemberRights(mainAcounts[10], 0xff);
+    await envConfig.setMemberRights(mainAcounts[10], 0xff);
 
     //User0 wydobywa kasę - wszyscy 1000,00
     cashToken0 = await swapContractSigner(cashToken, 0);
@@ -129,7 +129,7 @@ async function setup() {
     bond4 = await attach('BaseBondToken', bonds[4], 10);
 
     //oznacz platformę jako uprawnioną
-    await contractMR.setMemberRights(table.address, 0xff);
+    await envConfig.setMemberRights(table.address, 0xff);
 
     //register table to Oblig
     await bond0.addPatform(table.address);
@@ -156,18 +156,24 @@ try {
 
   //await bond0_0.issue(100);
   await cashToken0.approve(bond0_0.address, 10000000);
+
+  await envConfig.setCurrentDate(20230529);
+//  console.log ("Now: ", (await envConfig.getCurrentDate()).toString()); 
+
   await bond0_0.issue(9);
+  await envConfig.setCurrentDate(20230530);
+//  await envConfig.setNow(0);
 
 //nowa oferta
   //let table0 = await swapContractSigner(table, 0);
   //await table0.newOffer(bond0_0.address, 20230527, 10);
   console.log("ssssssss: "+table.address);
   console.log("ssssssss: "+bond0_0.address);
-  var off = await bond0_0.makeOffer(table.address, 20230528, 5, 50000);
+  var off = await bond0_0.makeOffer(table.address, 20230529, 5, 50000);
   console.log(off.toString());
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
-  console.log("offer nr: " + await bond0_0.makeOffer(table.address, 20230528, 3, 30000));
+  console.log("offer nr: " + await bond0_0.makeOffer(table.address, 20230529, 3, 30000));
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
   await bond0_0.canceleOffer1(table.address, 2);
@@ -189,7 +195,7 @@ try {
   
 //  console.log("-->" + await bond0_0.makeOffer(table.address, 20230527, 5));
   await cashToken.approve(bond0_0.address, 10000000);
-  await bond0_0.redem(20230528, 1);
+  await bond0_0.redemption(20230529, 1);
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
   console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
   console.log("=======================================");

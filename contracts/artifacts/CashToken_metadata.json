@@ -9,7 +9,7 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "rights",
+						"name": "envConfig",
 						"type": "address"
 					}
 				],
@@ -363,11 +363,11 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "rights",
+						"name": "envConfig",
 						"type": "address"
 					}
 				],
-				"name": "setMembershipRights",
+				"name": "setEnvironmentConfig",
 				"outputs": [],
 				"stateMutability": "nonpayable",
 				"type": "function"
@@ -622,19 +622,19 @@
 			]
 		},
 		"contracts/CashToken.sol": {
-			"keccak256": "0xc357f4407dec4186fcc8ef6b7893e14ff079ba25b02026771c035b7af46340f2",
+			"keccak256": "0x6dfaa20459ae8b253f1c1cd85e60182381f89eb247147397fb0bc51711a7bbfb",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://b9dabe9334379e3966b8aa6af8fc39cab71cf6b6032345cbeb75ca9b6949352b",
-				"dweb:/ipfs/QmUo37EZKdhYq3Vpmo5CLNjnZcMkCg1fCVgkHsfPuKm8zC"
+				"bzz-raw://f0562b6a174bf3f5fcfccdc4b66781f96f5a1fcd8d77656b896def2c2b594072",
+				"dweb:/ipfs/QmQk3EfFsxzMGmY7URTWhTf3TyjadY6D489dL5Equ8ezcJ"
 			]
 		},
-		"contracts/MembershipRights.sol": {
-			"keccak256": "0x8c58e6e5b3551b667d2b6a590be9eb2b628fc278f6c3cc3b03ebe63b3d459ebf",
+		"contracts/EnvironmentConfig.sol": {
+			"keccak256": "0x5a74443b04fcb968b2f856c618e1d3b2c412953475d3059bb9f9be4db89825e6",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://c4088852d1ff685b8dfd84eebfdeeafb76d0a4b94e1aad59799f0de8eb8c3cc0",
-				"dweb:/ipfs/QmWqAgjadpXo8x62ffayVwXr9bWY2VSzXBzmrvr5t34pV6"
+				"bzz-raw://d64e1d20ce8a94014d3cdac192f48b34d0e0bb99c9ff772489e9e5826b0c7edb",
+				"dweb:/ipfs/QmbQewfXABnbMmpgibytpZb95rRRbtVmWPsxPsL6dSdEfq"
 			]
 		}
 	},
