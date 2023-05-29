@@ -8,8 +8,8 @@ import "./BondInterface.sol";
 error TableZeroAddress();
 
 struct BondOfferDef {
-    address payable offerent;   // User who sell bonds
-    address payable bond2Sell;  // Bond offered 
+    address offerent;   // User who sell bonds
+    address bond2Sell;  // Bond offered 
     uint256 bondDate;           // Bond's date
     uint256 amount2Sell;        // The number of tokens to sell
     uint256 price;              // Price reqested in exchange
@@ -68,7 +68,7 @@ contract OfferTable {
         emit OfferCreated(_offersNb);
         return _offersNb;      
     }
-
+/*
     function cancelOffer(uint256 offerId) external existing(offerId) active(offerId) returns(BondOfferDef memory offer) {  
         offer = _offers[offerId-1];
         require(offer.active == true, "Offer inactive");
@@ -77,14 +77,28 @@ contract OfferTable {
         _ownerOffers[msg.sender][offerId-1] = false;
         emit OfferCanceled(offerId-1);
     }
+*/
+    function withdrawOffer(uint256 offerId) external existing(offerId) active(offerId) returns(BondOfferDef memory offer) {  
+        offer = _offers[offerId-1];
+        require(offer.active == true, "Offer inactive");
+        require(offer.offerent == msg.sender, "Operation can be invoked by seller");
+        
+        BondInterface(offer.bond2Sell).withdrawOffer(offer.offerent, offer.bondDate, offer.amount2Sell);
 
-    function finalizeOffer(uint256 offerId, address money) public payable existing(offerId) active(offerId) returns(bool){
+        _offers[offerId-1].active = false; 
+        _ownerOffers[msg.sender][offerId-1] = false;
+        emit OfferCanceled(offerId-1);
+    }
+
+    function acceptOffer(uint256 offerId, address money) public payable existing(offerId) active(offerId) returns(bool){
         if(money == address(0)) revert TableZeroAddress();
         BondOfferDef memory offer = _offers[offerId-1];
         require(offer.active == true, "Offer inactive");
         address buyer = msg.sender;
         IERC20(money).transferFrom(msg.sender, offer.offerent, offer.price);
-        BondInterface(offer.bond2Sell).transferFrom(offer.offerent, buyer, offer.bondDate, offer.amount2Sell);
+
+        BondInterface(offer.bond2Sell).acceptOffer(offer.offerent, buyer, offer.bondDate, offer.amount2Sell);
+
         _offers[offerId-1].active = false;
         _ownerOffers[msg.sender][offerId-1] = false;
         emit OfferFinalized(offerId);

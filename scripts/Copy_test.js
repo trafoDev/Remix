@@ -176,7 +176,10 @@ try {
   console.log("offer nr: " + await bond0_0.makeOffer(table.address, 20230529, 3, 30000));
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
-  await bond0_0.canceleOffer1(table.address, 2);
+
+  //bond0_0.canceleOffer(table.address, 2);
+  await table0.withdrawOffer(2);
+  
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
 
@@ -186,7 +189,7 @@ try {
   console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
   console.log("==>" + await cashToken.balanceOf(mainAcounts[1]));
   //await bond0_0.allowance(from, table0)
-  await table1.finalizeOffer(1, cashToken.address);
+  await table1.acceptOffer(1, cashToken.address);
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[1]));

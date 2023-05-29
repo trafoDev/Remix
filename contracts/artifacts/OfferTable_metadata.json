@@ -60,57 +60,6 @@
 						"internalType": "uint256",
 						"name": "offerId",
 						"type": "uint256"
-					}
-				],
-				"name": "cancelOffer",
-				"outputs": [
-					{
-						"components": [
-							{
-								"internalType": "address payable",
-								"name": "offerent",
-								"type": "address"
-							},
-							{
-								"internalType": "address payable",
-								"name": "bond2Sell",
-								"type": "address"
-							},
-							{
-								"internalType": "uint256",
-								"name": "bondDate",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "amount2Sell",
-								"type": "uint256"
-							},
-							{
-								"internalType": "uint256",
-								"name": "price",
-								"type": "uint256"
-							},
-							{
-								"internalType": "bool",
-								"name": "active",
-								"type": "bool"
-							}
-						],
-						"internalType": "struct BondOfferDef",
-						"name": "offer",
-						"type": "tuple"
-					}
-				],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "uint256",
-						"name": "offerId",
-						"type": "uint256"
 					},
 					{
 						"internalType": "address",
@@ -118,7 +67,7 @@
 						"type": "address"
 					}
 				],
-				"name": "finalizeOffer",
+				"name": "acceptOffer",
 				"outputs": [
 					{
 						"internalType": "bool",
@@ -136,12 +85,12 @@
 					{
 						"components": [
 							{
-								"internalType": "address payable",
+								"internalType": "address",
 								"name": "offerent",
 								"type": "address"
 							},
 							{
-								"internalType": "address payable",
+								"internalType": "address",
 								"name": "bond2Sell",
 								"type": "address"
 							},
@@ -207,6 +156,57 @@
 				],
 				"stateMutability": "payable",
 				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "uint256",
+						"name": "offerId",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawOffer",
+				"outputs": [
+					{
+						"components": [
+							{
+								"internalType": "address",
+								"name": "offerent",
+								"type": "address"
+							},
+							{
+								"internalType": "address",
+								"name": "bond2Sell",
+								"type": "address"
+							},
+							{
+								"internalType": "uint256",
+								"name": "bondDate",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "amount2Sell",
+								"type": "uint256"
+							},
+							{
+								"internalType": "uint256",
+								"name": "price",
+								"type": "uint256"
+							},
+							{
+								"internalType": "bool",
+								"name": "active",
+								"type": "bool"
+							}
+						],
+						"internalType": "struct BondOfferDef",
+						"name": "offer",
+						"type": "tuple"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
 			}
 		],
 		"devdoc": {
@@ -245,19 +245,19 @@
 			]
 		},
 		"contracts/BondInterface.sol": {
-			"keccak256": "0xb7246787e563fe258857b76052643c76fd3bd98f6ff5df61dff4f8ba03772c8d",
+			"keccak256": "0x3d3508dea814b94808f2e9e3558855b01a5f54b0d95f9346d21fa8f98d46208a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://dacd7c27e2ba7d396e267dffac34f6d175636658355f06bebd3deee30af31a5d",
-				"dweb:/ipfs/QmR6eFuQehmGo6QqrcRQJWss2BjzF8ipz7YshX3K5EdkCz"
+				"bzz-raw://fcf881b885881ad09e89bcc4dbc3c8ec84b6ec593cf7974f2a5b697abdfa49ee",
+				"dweb:/ipfs/QmNqGgR9MVk6R47bZtXb5B7ka95wd2EsdZSH5e6E1NitmA"
 			]
 		},
 		"contracts/OfferTable.sol": {
-			"keccak256": "0x263429256dc2049a32a7e91e0d4644dd98026926fa14823b84dce64e29c5d66e",
+			"keccak256": "0x3eabc60cf8b8579058ff08aec969cd4a81aa194c284c6b403469ce3b44d4cf33",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://0da592089e97b899525b496edfb912644befec53fe0605d69c80e5ddb214ab32",
-				"dweb:/ipfs/QmZdtjHxWgRrb7L2cd2bBjsivMtecm8y8ZB1fqGZDzPHPt"
+				"bzz-raw://cbd4bf26e35cc27331b5762c7a99065e6b1184035c5f38924640aed4e6c227db",
+				"dweb:/ipfs/QmVjKzjgBEcfAbHKSYP6SwW921pxkqDmbs2qeSSmTqysMM"
 			]
 		},
 		"hardhat/console.sol": {

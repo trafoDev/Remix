@@ -119,6 +119,40 @@
 				"inputs": [
 					{
 						"internalType": "address",
+						"name": "seller",
+						"type": "address"
+					},
+					{
+						"internalType": "address",
+						"name": "buyer",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bondDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "acceptOffer",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
 						"name": "platform",
 						"type": "address"
 					}
@@ -208,7 +242,7 @@
 						"type": "uint256"
 					}
 				],
-				"name": "canceleOffer1",
+				"name": "canceleOffer",
 				"outputs": [
 					{
 						"internalType": "bool",
@@ -543,40 +577,6 @@
 				"inputs": [
 					{
 						"internalType": "address",
-						"name": "from",
-						"type": "address"
-					},
-					{
-						"internalType": "address",
-						"name": "to",
-						"type": "address"
-					},
-					{
-						"internalType": "uint256",
-						"name": "date",
-						"type": "uint256"
-					},
-					{
-						"internalType": "uint256",
-						"name": "amount",
-						"type": "uint256"
-					}
-				],
-				"name": "transferFrom",
-				"outputs": [
-					{
-						"internalType": "bool",
-						"name": "",
-						"type": "bool"
-					}
-				],
-				"stateMutability": "nonpayable",
-				"type": "function"
-			},
-			{
-				"inputs": [
-					{
-						"internalType": "address",
 						"name": "newOwner",
 						"type": "address"
 					}
@@ -590,6 +590,35 @@
 				"inputs": [],
 				"name": "unpause",
 				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "bondOwner",
+						"type": "address"
+					},
+					{
+						"internalType": "uint256",
+						"name": "bondDate",
+						"type": "uint256"
+					},
+					{
+						"internalType": "uint256",
+						"name": "amount",
+						"type": "uint256"
+					}
+				],
+				"name": "withdrawOffer",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
 				"stateMutability": "nonpayable",
 				"type": "function"
 			}
@@ -720,19 +749,19 @@
 			]
 		},
 		"contracts/BaseBondToken.sol": {
-			"keccak256": "0x1a6897b78dc6a27fbc7fb13d552412d12fb7a51a18427d974ae168fde9ab836c",
+			"keccak256": "0x7db93919f55db85007f06a675c3d26ec34d01ffa8afa264fb42d36d435606f7e",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://6c3b6891a56dc99f876f2f33c454e6dcf22c450c535e88cad264bc485b4b7ebf",
-				"dweb:/ipfs/QmYmvGBEAjp4YWMaKC2VdrgyK5ixQu3bfnB9ECbZDEfYrW"
+				"bzz-raw://8ba3f4f49db3380d7762983a6fa785418a100f1a6009ca27d54ae7d08e9a635b",
+				"dweb:/ipfs/QmXwSS7EwwM2yn5HrFthnEJ7pFhqDMAUB7TmtaG3s6t6c7"
 			]
 		},
 		"contracts/BondInterface.sol": {
-			"keccak256": "0xb7246787e563fe258857b76052643c76fd3bd98f6ff5df61dff4f8ba03772c8d",
+			"keccak256": "0x3d3508dea814b94808f2e9e3558855b01a5f54b0d95f9346d21fa8f98d46208a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://dacd7c27e2ba7d396e267dffac34f6d175636658355f06bebd3deee30af31a5d",
-				"dweb:/ipfs/QmR6eFuQehmGo6QqrcRQJWss2BjzF8ipz7YshX3K5EdkCz"
+				"bzz-raw://fcf881b885881ad09e89bcc4dbc3c8ec84b6ec593cf7974f2a5b697abdfa49ee",
+				"dweb:/ipfs/QmNqGgR9MVk6R47bZtXb5B7ka95wd2EsdZSH5e6E1NitmA"
 			]
 		},
 		"contracts/Clock.sol": {
@@ -752,11 +781,11 @@
 			]
 		},
 		"contracts/OfferTable.sol": {
-			"keccak256": "0x0f0e9f7257dac55fcd1d8e029b04f5a0222f41fada37977301ea253b50360a7a",
+			"keccak256": "0x580c7d02368a35398c08fac1b835e45673f588743c6893b75c24b85e751dd32c",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4ac5f95f6a9acbe90e98f0cb7a1778d5268b40e3fba9add9a6959d79ad7de777",
-				"dweb:/ipfs/Qmc5ia3TrjxwaravBeiYckNWHExj67EdRqqUe3ZGSBkJpo"
+				"bzz-raw://05cea90be4dee9290ad8c919f089d84eabc6c2dd4ed727349e35d3bb3f4d2599",
+				"dweb:/ipfs/QmaJwGNcsXSSLjWq4MuPnfNRN4PebUjtkxnav2EjV7rrpQ"
 			]
 		},
 		"hardhat/console.sol": {

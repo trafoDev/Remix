@@ -115,16 +115,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     function decimals() public view virtual override returns (uint8) {
         return 0;
     }    
-/*
 
-    function timestampToDate(uint timestamp) internal pure returns (uint256 date) {
-        uint year;
-        uint month;
-        uint day;
-        (year, month, day) = _daysToDate(timestamp / SECONDS_PER_DAY);
-        date = year * 10000 + month * 100 + day;
-    }
-*/
     function setMembershipenvConfig(address envConfig) public onlyOwner {
         _envConfig = EnvironmentConfig(envConfig);
     }
@@ -204,29 +195,6 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     function transferFrom(address , address , uint256 ) public virtual override returns (bool) {
         revert NotAvailable();
     }
-    function transferFrom(address from, address to, uint256 date, uint256 amount) public virtual returns (bool) {
-        //msg.sender should be the offering platform
-
-        //Basic validations
-//        require(date > 20200101, "Invalid bond date");
-        require(totalSupply() >= amount, "Amout exceeds total supplay");
-        if(from == address(0) || to == address(0)) revert BondZeroAddress();
-        //validating parties envConfig
-        require(_envConfig.hasRights(msg.sender, ASSET_OFFERING), "The sender isn't defined as an approved offering platform.");
-        require(_envConfig.hasRights(to,  ASSET_HOLDER), "Not a holder");
-        //Vadidating balances and allowances
-        require(allowance(from, msg.sender) >= amount, "Not enough allowance");
-        require(balanceOf(from) >= amount, "The amout exceeds the total supplay");
-
-        _removeFrom(from, date, amount, true);
-        _balances[from] -= amount;
-        _decreaseAllowance(from, msg.sender, amount);
-        _assignTo(to, date, amount);
-        _balances[to] += amount;
-
-        emit Transfer(from, to, amount);
-        return true;
-    }
 
     function _assignTo(address to, uint256 date, uint256 amount)  internal virtual {
         if(_bondBalance[to].length == 0) {
@@ -242,6 +210,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
             }
         }
     }
+    
     function _removeFrom(address from, uint256 date, uint256 amount, bool blocked)  internal virtual {
         uint index = _bondIndex[from][date];
         require(index != 0, "No such bonds" );
@@ -283,8 +252,8 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         uint offer = OfferTable(table).newOffer(msg.sender, buyDate, amount, reqPrice);
         return offer;
     }
-
-    function canceleOffer1(address table, uint offer) public returns(bool) {
+/*
+    function canceleOffer(address table, uint offer) public returns(bool) {
         require(_platformsAllowed[table] == true, "Platform isn't registered.");
         BondOfferDef memory offerDef =  OfferTable(table).cancelOffer(offer);
         uint _index = _bondIndex[msg.sender][offerDef.bondDate];
@@ -296,6 +265,39 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
 
         _bondBalance[msg.sender][_index-1].blocked -= offerDef.amount2Sell;
         _decreaseAllowance(msg.sender, table, offerDef.amount2Sell);
+        return true;
+    }
+*/
+    function acceptOffer(address seller, address buyer, uint256 bondDate, uint256 amount) public virtual returns (bool) {
+        require(_platformsAllowed[msg.sender] == true, "Platform isn't registered.");
+        require(totalSupply() >= amount, "Amout exceeds total supplay");
+        if(seller == address(0) || buyer == address(0)) revert BondZeroAddress();
+        //validating parties envConfig
+        require(_envConfig.hasRights(msg.sender, ASSET_OFFERING), "The sender isn't defined as an approved offering platform.");
+        require(_envConfig.hasRights(buyer,  ASSET_HOLDER), "Not a holder");
+        //Vadidating balances and allowances
+        require(allowance(seller, msg.sender) >= amount, "Not enough allowance");
+        require(balanceOf(seller) >= amount, "The amout exceeds the total supplay");
+
+        _removeFrom(seller, bondDate, amount, true);
+        _balances[seller] -= amount;
+        _decreaseAllowance(seller, msg.sender, amount);
+        _assignTo(buyer, bondDate, amount);
+        _balances[buyer] += amount;
+
+        emit Transfer(seller, buyer, amount);
+        return true;
+    }
+
+    function withdrawOffer(address bondOwner, uint256 bondDate, uint256 amount) public virtual returns(bool) {
+        require(_platformsAllowed[msg.sender] == true, "Platform isn't registered.");
+        uint _index = _bondIndex[bondOwner][bondDate];
+        require(_index != 0, "No such bonds" );
+        BondsByDate memory bonds = _bondBalance[bondOwner][_index-1];
+        require(bonds.blocked >= amount, "Something very Wrong" );  
+
+        _bondBalance[bondOwner][_index-1].blocked -= amount;
+        _decreaseAllowance(bondOwner, msg.sender, amount);
         return true;
     }
 
