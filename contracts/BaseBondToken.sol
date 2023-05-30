@@ -50,6 +50,8 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
     mapping(address => mapping(address => uint256)) private _allowances;    
     uint256 private _totalSupply;
 
+    event Transfer(address indexed from, address indexed to, uint256 bondDate, uint256 value);    
+
     modifier nonZero(uint256 amount) {
         require(amount > 0 , "The number of bonds should be greater than 0.");
         _;
@@ -116,23 +118,6 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         return 0;
     }    
 
-    function setMembershipenvConfig(address envConfig) public onlyOwner {
-        _envConfig = EnvironmentConfig(envConfig);
-    }
-
-    function pause() public onlyOwner {
-        _pause();
-    }
-
-    function unpause() public onlyOwner {
-        _unpause();
-    }
-
-    function getAllByBuyer(address buyer) public view returns (BondsByDate[] memory) {
-        if(buyer == address(0)) revert BondZeroAddress();
-        return _bondBalance[buyer];
-    }
-
     function totalSupply() public view virtual override returns (uint256) {
         return _totalSupply;
     }    
@@ -144,8 +129,22 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
             // Overflow not possible: balance + amount is at most totalSupply + amount, which is checked above.
             _balances[account] += amount;
         }
-//        emit Transfer(address(0), account, amount);
+        emit Transfer(address(0), account, amount);
     }
+
+    function _transfer(address from, address to, uint256 amount) internal virtual {
+        if(from == address(0) || to == address(0)) revert BondZeroAddress();
+
+        uint256 _fromBalance = _balances[from];
+        require(_fromBalance >= amount, "Transfer amount exceeds balance");
+        unchecked {
+            _balances[from] = _fromBalance - amount;
+            // Overflow not possible: the sum of all balances is capped by totalSupply, and the sum is preserved by
+            // decrementing then incrementing.
+            _balances[to] += amount;
+        }
+        emit Transfer(from, to, amount);
+    }    
     
     function _burn(address account, uint256 amount) internal virtual {
         if(account == address(0)) revert BondZeroAddress();
@@ -157,22 +156,19 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
             // Overflow not possible: amount <= accountBalance <= totalSupply.
             _totalSupply -= amount;
         }
-//        emit Transfer(account, address(0), amount);
-//        _afterTokenTransfer(account, address(0), amount);
+        emit Transfer(account, address(0), amount);
     }
 
-    function allowance(address bondOwner, address platform)  public view virtual override returns (uint256) {
-        return _allowances[bondOwner][platform];
-    }
     function _approve(address bondOwner, address platform, uint256 amount) internal virtual {
         if(bondOwner == address(0) || platform == address(0)) revert BondZeroAddress();
         _allowances[bondOwner][platform] = amount;
-       // emit Approval(bondOwner, platform, amount);
     }
+
     function _increaseAllowance(address bondOwner, address platform, uint256 addedValue) internal virtual returns (bool) {
         _approve(bondOwner, platform, allowance(bondOwner, platform) + addedValue);
         return true;
     }
+
     function _decreaseAllowance(address bondOwner, address platform, uint256 subtractedValue) internal virtual returns (bool) {
         uint256 currentAllowance = allowance(bondOwner, platform);
         require(currentAllowance >= subtractedValue, "Decreased allowance below 0");
@@ -180,6 +176,10 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
             _approve(bondOwner, platform, currentAllowance - subtractedValue);
         }
         return true;
+    }
+
+    function allowance(address bondOwner, address platform)  public view virtual override returns (uint256) {
+        return _allowances[bondOwner][platform];
     }
     function balanceOf(address account) public view virtual override returns (uint256) {
         return _balances[account];
@@ -210,7 +210,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
             }
         }
     }
-    
+
     function _removeFrom(address from, uint256 date, uint256 amount, bool blocked)  internal virtual {
         uint index = _bondIndex[from][date];
         require(index != 0, "No such bonds" );
@@ -226,13 +226,22 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         _bondBalance[from][index-1].balance -= amount;
     }
 
+    function setMembershipenvConfig(address envConfig) public onlyOwner {
+        _envConfig = EnvironmentConfig(envConfig);
+    }
+
+    function getAllByBuyer(address buyer) public view returns (BondsByDate[] memory) {
+        if(buyer == address(0)) revert BondZeroAddress();
+        return _bondBalance[buyer];
+    }
+
     function issue(uint256 amount) public nonZero(amount) initialized() {
-        require(_envConfig.hasRights(msg.sender,  ASSET_HOLDER), "The buyer isn't defined as an approved asset holder.");
+        require(_envConfig.isBlocked(msg.sender) == false, "User is blocked.");
+        require(_envConfig.hasRights(msg.sender,  ASSET_HOLDER), "Buyer isn't defined as an approved asset holder.");
         require(totalSupply() + amount <= _maxSupplay, "The total number of bonds exceeds the entire supply value.");
         require(_money.balanceOf(msg.sender) >= amount * _bondPrice, "The buyer doesn't have enough money in their account.");
         require(_money.allowance(msg.sender, address(this)) >= amount * _bondPrice, "The account allowance for the trade is set too low.");
 
-//        uint256 _currDate = timestampToDate(block.timestamp);
         uint256 _currDate = _envConfig.getCurrentDate();
 
         _assignTo(msg.sender, _currDate, amount);
@@ -240,34 +249,19 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         _money.transferFrom(msg.sender, owner(), amount * _bondPrice);
     }
 
-    function makeOffer(address table, uint buyDate, uint256 amount, uint reqPrice) public returns(uint256) {
+    function offerBonds(address table, uint bondDate, uint256 amount, uint reqPrice) public returns(uint256) {
         require(_platformsAllowed[table] == true, "Platform isn't registered.");
-        uint index = _bondIndex[msg.sender][buyDate];
+        uint index = _bondIndex[msg.sender][bondDate];
         require(index != 0, "No such bonds" );
         BondsByDate memory bonds = _bondBalance[msg.sender][index-1];
         require(bonds.balance - bonds.blocked >= amount, "Not enough spare bonds" );  
 
         _bondBalance[msg.sender][index-1].blocked += amount;
         _increaseAllowance(msg.sender, table, amount);
-        uint offer = OfferTable(table).newOffer(msg.sender, buyDate, amount, reqPrice);
+        uint offer = OfferTable(table).registerNewOffer(msg.sender, bondDate, amount, reqPrice);
         return offer;
     }
-/*
-    function canceleOffer(address table, uint offer) public returns(bool) {
-        require(_platformsAllowed[table] == true, "Platform isn't registered.");
-        BondOfferDef memory offerDef =  OfferTable(table).cancelOffer(offer);
-        uint _index = _bondIndex[msg.sender][offerDef.bondDate];
-        require(_index != 0, "No such bonds" );
-        BondsByDate memory bonds = _bondBalance[msg.sender][_index-1];
-        require(bonds.blocked >= offerDef.amount2Sell, "Something very Wrong" );  
-        require(address(this) == offerDef.bond2Sell, "Something very Wrong - wrong bond" );  
-        require(msg.sender == offerDef.offerent, "Something very Wrong - someoneelses offer" );  
 
-        _bondBalance[msg.sender][_index-1].blocked -= offerDef.amount2Sell;
-        _decreaseAllowance(msg.sender, table, offerDef.amount2Sell);
-        return true;
-    }
-*/
     function acceptOffer(address seller, address buyer, uint256 bondDate, uint256 amount) public virtual returns (bool) {
         require(_platformsAllowed[msg.sender] == true, "Platform isn't registered.");
         require(totalSupply() >= amount, "Amout exceeds total supplay");
@@ -280,12 +274,9 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
         require(balanceOf(seller) >= amount, "The amout exceeds the total supplay");
 
         _removeFrom(seller, bondDate, amount, true);
-        _balances[seller] -= amount;
-        _decreaseAllowance(seller, msg.sender, amount);
         _assignTo(buyer, bondDate, amount);
-        _balances[buyer] += amount;
-
-        emit Transfer(seller, buyer, amount);
+        _transfer(seller, buyer, amount);
+        _decreaseAllowance(seller, msg.sender, amount);
         return true;
     }
 
@@ -303,6 +294,7 @@ contract BaseBondToken is Context, IERC20, IERC20Metadata, Pausable, Ownable, Bo
 
     function redemption(uint buyDate, uint256 amount) public nonZero(amount) initialized() {
         uint _days = _envConfig.getDaysFromNow(buyDate);
+        require(_envConfig.isBlocked(msg.sender) == false, "User is blocked.");
         require(_envConfig.hasRights(msg.sender,  ASSET_HOLDER), "Not a holder");
         require(totalSupply() >= amount, "The amout exceeds the total supplay of the asset");
         require(_money.balanceOf(owner()) >= amount * _bondPrice);

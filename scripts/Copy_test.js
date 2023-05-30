@@ -71,14 +71,6 @@ try {
     // The transaction that was sent to the network to deploy the Contract
     console.log('contract Attached: ' + contract.address)
 //    var accounts = await web3.eth.getAccounts();
-/*
-    console.log(accounts);
-    console.log(await contract.owner());
-    console.log(await contract.getRights(accounts[1]));
-    contract = await swapContractSigner(contract, 2);
-    console.log(await contract.getRights(accounts[2]));
-//  console.log(cn)
-*/
     return contract;
   } catch (e) {
     console.log("err")
@@ -93,7 +85,7 @@ async function setup() {
     cashToken = await deploy('CashToken', 10, envConfig.address);
     baseBond = await deploy('BaseBondToken', 10);
     factory = await deploy('BondFactory', 10, baseBond.address, envConfig.address, cashToken.address);
-    table = await deploy('OfferTable', 10);
+    table = await deploy('OfferTable', 10, envConfig.address);
 
     //Wszyscy userzy - all rights
     await envConfig.setMemberRights(mainAcounts[0], 0xff);
@@ -146,11 +138,34 @@ async function setup() {
   }
 }
  
-async function test1() {
+async function buying() {
 
 try {
   //user 0 kuuje 100 obligacji
   bond0_0 = await swapContractSigner(bond0, 0);
+  await envConfig.setCurrentDate(20230101);
+  await envConfig.blockAddress(mainAcounts[0]);
+  //bool 
+  console.log("blocked: " + (await envConfig.isBlocked(mainAcounts[0])).toString());
+
+  try{ 
+    await bond0_0.issue(90); console.log("Test failed!");throw(new Error('Failed: should return not enough allowance')); 
+  } catch (e) {console.log("Test OK Expected error: " + e.message);}
+
+  await envConfig.releaseAddress(mainAcounts[0]);
+
+  try{ 
+    await cashToken0.approve(bond0_0.address, 900000);
+    console.log("Allowance-->" + await cashToken0.allowance(mainAcounts[0], bond0_0.address));
+    await bond0_0.issue(90);
+    console.log("Allowance-->" + await cashToken0.allowance(mainAcounts[0], bond0_0.address));
+    balance = await cashToken0.balanceOf(mainAcounts[0]);
+    console.log("Balance-->" + balance);
+  } catch (e) {console.log("Test failed: " + e.message);}
+
+/*
+
+
   table0 = await swapContractSigner(table, 0);
   table1 = await swapContractSigner(table, 1);
 
@@ -160,20 +175,19 @@ try {
   await envConfig.setCurrentDate(20230529);
 //  console.log ("Now: ", (await envConfig.getCurrentDate()).toString()); 
 
-  await bond0_0.issue(9);
+  await bond0_0.issue(90);
+
   await envConfig.setCurrentDate(20230530);
 //  await envConfig.setNow(0);
 
 //nowa oferta
   //let table0 = await swapContractSigner(table, 0);
   //await table0.newOffer(bond0_0.address, 20230527, 10);
-  console.log("ssssssss: "+table.address);
-  console.log("ssssssss: "+bond0_0.address);
-  var off = await bond0_0.makeOffer(table.address, 20230529, 5, 50000);
+  var off = await bond0_0.offerBonds(table.address, 20230529, 5, 50000);
   console.log(off.toString());
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
-  console.log("offer nr: " + await bond0_0.makeOffer(table.address, 20230529, 3, 30000));
+  console.log("offer nr: " + await bond0_0.offerBonds(table.address, 20230529, 3, 30000));
   console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
 
@@ -196,7 +210,81 @@ try {
   console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
   console.log("==>" + await cashToken.balanceOf(mainAcounts[1]));
   
-//  console.log("-->" + await bond0_0.makeOffer(table.address, 20230527, 5));
+//  console.log("-->" + await bond0_0.offerBonds(table.address, 20230527, 5));
+  await cashToken.approve(bond0_0.address, 10000000);
+  await bond0_0.redemption(20230529, 1);
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
+  console.log("=======================================");
+  await bond0.coupon();
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[1]));
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[1]));
+  console.log("=======================================");
+
+    console.log("==>" + (await table.getOffers()).toString());
+//  console.log('qqqqqqqqqq:' +   o1.address);
+  console.log('qqqqqqqqqq:' +   await bond4.name());
+
+*/
+
+   } catch (e) {
+    console.log("err")
+    console.log(e.message)
+  }
+}
+
+async function test2() {
+
+try {
+  //user 0 kuuje 100 obligacji
+  bond0_0 = await swapContractSigner(bond0, 0);
+  table0 = await swapContractSigner(table, 0);
+  table1 = await swapContractSigner(table, 1);
+
+  //await bond0_0.issue(100);
+  await cashToken0.approve(bond0_0.address, 10000000);
+
+  await envConfig.setCurrentDate(20230529);
+//  console.log ("Now: ", (await envConfig.getCurrentDate()).toString()); 
+
+  await bond0_0.issue(90);
+  
+  await envConfig.setCurrentDate(20230530);
+//  await envConfig.setNow(0);
+
+//nowa oferta
+  //let table0 = await swapContractSigner(table, 0);
+  //await table0.newOffer(bond0_0.address, 20230527, 10);
+  var off = await bond0_0.offerBonds(table.address, 20230529, 5, 50000);
+  console.log(off.toString());
+  console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
+  console.log("offer nr: " + await bond0_0.offerBonds(table.address, 20230529, 3, 30000));
+  console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
+
+  //bond0_0.canceleOffer(table.address, 2);
+  await table0.withdrawOffer(2);
+  
+  console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
+
+
+  //sprawdzam allowance
+  await cashToken1.approve(table.address, 100000);
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[1]));
+  //await bond0_0.allowance(from, table0)
+  await table1.acceptOffer(1, cashToken.address);
+  console.log("-->" + await bond0_0.allowance(mainAcounts[0], table.address));
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
+  console.log("==>" + await bond0_0.balanceOf(mainAcounts[1]));
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[0]));
+  console.log("==>" + await cashToken.balanceOf(mainAcounts[1]));
+  
+//  console.log("-->" + await bond0_0.offerBonds(table.address, 20230527, 5));
   await cashToken.approve(bond0_0.address, 10000000);
   await bond0_0.redemption(20230529, 1);
   console.log("==>" + await bond0_0.balanceOf(mainAcounts[0]));
@@ -223,8 +311,8 @@ try {
 
 async function main() {
   await setup();
- // await init()
- await test1();
+  //await buying()
+ await test2();
 }
 
 main();

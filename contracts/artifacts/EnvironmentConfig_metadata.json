@@ -30,6 +30,19 @@
 				"type": "event"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "usr",
+						"type": "address"
+					}
+				],
+				"name": "blockAddress",
+				"outputs": [],
+				"stateMutability": "nonpayable",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "getCurrentDate",
 				"outputs": [
@@ -118,6 +131,25 @@
 				"type": "function"
 			},
 			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "usr",
+						"type": "address"
+					}
+				],
+				"name": "isBlocked",
+				"outputs": [
+					{
+						"internalType": "bool",
+						"name": "",
+						"type": "bool"
+					}
+				],
+				"stateMutability": "view",
+				"type": "function"
+			},
+			{
 				"inputs": [],
 				"name": "owner",
 				"outputs": [
@@ -128,6 +160,19 @@
 					}
 				],
 				"stateMutability": "view",
+				"type": "function"
+			},
+			{
+				"inputs": [
+					{
+						"internalType": "address",
+						"name": "usr",
+						"type": "address"
+					}
+				],
+				"name": "releaseAddress",
+				"outputs": [],
+				"stateMutability": "nonpayable",
 				"type": "function"
 			},
 			{
@@ -311,11 +356,11 @@
 			]
 		},
 		"contracts/EnvironmentConfig.sol": {
-			"keccak256": "0x226901d8bf44a4461bcc867f864c5ad1a51328cd83cb1eb9a2addbcfe9b4443f",
+			"keccak256": "0xdddb7d5bc76a1013854a7898bdb340f1c2c34d5905958c5da5418ca018829e4a",
 			"license": "MIT",
 			"urls": [
-				"bzz-raw://4102f81de40a39f73ca9a97730ff62107a12a0d076aef319e006b09b91a43f44",
-				"dweb:/ipfs/QmeDL3fXZGMoQSfsHSHMFmonVndFn4JEyu2j6Zz2o974m3"
+				"bzz-raw://3cf2c29546dd84189ade941b3a2a8b1683443a1ae25dffc76fe3daeeb14e59de",
+				"dweb:/ipfs/QmXoH1s4HXT9iTCoynRH3gq2K3FsGGbjJ81P9jc9SRFUFy"
 			]
 		}
 	},

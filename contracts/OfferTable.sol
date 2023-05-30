@@ -4,11 +4,12 @@ pragma solidity ^0.8.17;
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 import "hardhat/console.sol";
 import "./BondInterface.sol";
+import "./EnvironmentConfig.sol";
 
 error TableZeroAddress();
 
 struct BondOfferDef {
-    address offerent;   // User who sell bonds
+    address bondSeller;   // User who sell bonds
     address bond2Sell;  // Bond offered 
     uint256 bondDate;           // Bond's date
     uint256 amount2Sell;        // The number of tokens to sell
@@ -19,6 +20,7 @@ struct BondOfferDef {
 contract OfferTable {
     uint256 private _offersNb; 
 
+    EnvironmentConfig private _envConfig;
     BondOfferDef[] private _offers;
     mapping(address => mapping(uint256 => bool)) private _ownerOffers;
 
@@ -35,11 +37,12 @@ contract OfferTable {
         _;
     }    
 
-    constructor() {
-       _offersNb = 0;
+    constructor( EnvironmentConfig config) {
+        _offersNb = 0;
+        _envConfig = config;
     }
     function _isRegistered(uint256 offerId) internal view returns (bool registered){
-        registered = (_offers[offerId-1].offerent != address(0));
+        registered = (_offers[offerId-1].bondSeller != address(0));
     }    
     function _isActive(uint256 offerId) internal view returns (bool){
         return _offers[offerId-1].active;
@@ -49,15 +52,15 @@ contract OfferTable {
         return _offers;
     }
 
-    function newOffer(address seller, uint256 bondDate, uint256 amount2Sell, uint reqPrice) public  payable returns(uint256) {
+    function registerNewOffer(address seller, uint256 bondDate, uint256 amount2Sell, uint reqPrice) public  payable returns(uint256) {
         if(seller == address(0)) revert TableZeroAddress();
         require(amount2Sell > 0, "Ammount must be greter than 0");
         require(IERC20(msg.sender).balanceOf(seller) > amount2Sell, "Not enough bonds");
         require(bondDate > 20200101, "Invalid bond date");
 
         _offers.push(BondOfferDef({
-            offerent : payable(seller),
-            bond2Sell : payable(msg.sender),
+            bondSeller : seller,
+            bond2Sell : msg.sender,
             bondDate : bondDate,
             amount2Sell : amount2Sell,
             price : reqPrice,
@@ -68,22 +71,14 @@ contract OfferTable {
         emit OfferCreated(_offersNb);
         return _offersNb;      
     }
-/*
-    function cancelOffer(uint256 offerId) external existing(offerId) active(offerId) returns(BondOfferDef memory offer) {  
-        offer = _offers[offerId-1];
-        require(offer.active == true, "Offer inactive");
-        require(offer.bond2Sell == msg.sender, "Operation can be invoked by the bond");
-        _offers[offerId-1].active = false; 
-        _ownerOffers[msg.sender][offerId-1] = false;
-        emit OfferCanceled(offerId-1);
-    }
-*/
+
     function withdrawOffer(uint256 offerId) external existing(offerId) active(offerId) returns(BondOfferDef memory offer) {  
+        require(_envConfig.isBlocked(msg.sender) == false, "User is blocked.");
         offer = _offers[offerId-1];
         require(offer.active == true, "Offer inactive");
-        require(offer.offerent == msg.sender, "Operation can be invoked by seller");
+        require(offer.bondSeller == msg.sender, "Operation can be invoked by seller");
         
-        BondInterface(offer.bond2Sell).withdrawOffer(offer.offerent, offer.bondDate, offer.amount2Sell);
+        BondInterface(offer.bond2Sell).withdrawOffer(offer.bondSeller, offer.bondDate, offer.amount2Sell);
 
         _offers[offerId-1].active = false; 
         _ownerOffers[msg.sender][offerId-1] = false;
@@ -91,13 +86,15 @@ contract OfferTable {
     }
 
     function acceptOffer(uint256 offerId, address money) public payable existing(offerId) active(offerId) returns(bool){
+        require(_envConfig.isBlocked(msg.sender) == false, "User is blocked.");
         if(money == address(0)) revert TableZeroAddress();
         BondOfferDef memory offer = _offers[offerId-1];
         require(offer.active == true, "Offer inactive");
+        require(_envConfig.isBlocked(offer.bondSeller) == false, "Bond seller is blocked.");
         address buyer = msg.sender;
-        IERC20(money).transferFrom(msg.sender, offer.offerent, offer.price);
+        IERC20(money).transferFrom(msg.sender, offer.bondSeller, offer.price);
 
-        BondInterface(offer.bond2Sell).acceptOffer(offer.offerent, buyer, offer.bondDate, offer.amount2Sell);
+        BondInterface(offer.bond2Sell).acceptOffer(offer.bondSeller, buyer, offer.bondDate, offer.amount2Sell);
 
         _offers[offerId-1].active = false;
         _ownerOffers[msg.sender][offerId-1] = false;

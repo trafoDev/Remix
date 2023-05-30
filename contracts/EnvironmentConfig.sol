@@ -11,6 +11,7 @@ uint48 constant ASSET_OFFERING  = 0x80;
 
 contract EnvironmentConfig is Ownable, Clock {
     mapping (address => uint48) private _members;
+    mapping (address => bool) private _blockedAddress;
 
     modifier manageable() {
         require(msg.sender == owner() || hasRights(msg.sender, LIST_ADMIN), "User isn't a list administrator.");
@@ -41,5 +42,16 @@ contract EnvironmentConfig is Ownable, Clock {
     }     
     function getRights(address usr) public view returns(uint48){
         return _members[usr];
+    }    
+    function blockAddress(address usr) public manageable() {
+        _blockedAddress[usr] = true;
+    }    
+    function releaseAddress(address usr) public manageable() {
+        if( isBlocked(usr)) {
+            _blockedAddress[usr] = false;
+        }
+    }    
+    function isBlocked(address usr) public view returns(bool) {
+        return (_blockedAddress[usr] == true);
     }    
 }
